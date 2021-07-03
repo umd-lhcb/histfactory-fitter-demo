@@ -2,3 +2,6 @@ gen
 .direnv
 
 .lvimrc
+
+*.root
+*.pdf
