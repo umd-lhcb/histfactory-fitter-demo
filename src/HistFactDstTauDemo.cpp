@@ -885,3 +885,9 @@ void HistFactDstTauDemo() {
     c2->SaveAs("c2.pdf");
   }
 }
+
+int main(int, char** argv) {
+  HistFactDstTauDemo();
+
+  return 0;
+}
