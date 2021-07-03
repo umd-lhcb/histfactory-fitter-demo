@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sun Jul 04, 2021 at 01:12 AM +0200
+# Last Change: Sun Jul 04, 2021 at 01:24 AM +0200
 
 VPATH := src:gen
 
@@ -14,3 +14,8 @@ HistFactDstTauDemo:
 
 %: %.cpp
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
+
+.PHONY: clean
+
+clean:
+	@rm -rf ./gen/*
