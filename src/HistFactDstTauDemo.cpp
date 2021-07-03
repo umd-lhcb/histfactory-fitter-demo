@@ -47,6 +47,7 @@
 
 #define UNBLIND
 
+using namespace std;
 
 TDatime *date = new TDatime();
 
@@ -63,7 +64,7 @@ void HistFactDstTauDemo() {
   gROOT->ProcessLine("gStyle->SetTitleY(0.970);");
   char substr[128];
   RooRandom::randomGenerator()->SetSeed(date->Get()%100000);
-  cout << date->Get()%100000 << endl; //For ToyMC, so I can run multiple copies 
+  cout << date->Get()%100000 << endl; //For ToyMC, so I can run multiple copies
   //with different seeds without recompiling
 
   RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR) ; //avoid accidental unblinding!
@@ -100,7 +101,7 @@ void HistFactDstTauDemo() {
 
   TStopwatch sw, sw2, sw3;
 
-  
+
 
   TRandom *r3 = new TRandom3(date->Get());
 
@@ -108,7 +109,7 @@ void HistFactDstTauDemo() {
   using namespace HistFactory;
 
   // Many many flags for steering
-  /* STEERING OPTIONS */ 
+  /* STEERING OPTIONS */
   const bool constrainDstst=true;
   const bool useMinos=true;
   const bool useMuShapeUncerts = true;
@@ -121,7 +122,7 @@ void HistFactDstTauDemo() {
   const bool fitfirst = false;
   const bool slowplots = true;
   const bool BBon3d = true; //flag to enable Barlow-Beeston procedure for all histograms.
-  //Should allow easy comparison of fit errors with and 
+  //Should allow easy comparison of fit errors with and
   //without the technique. 3d or not is legacy from an old
   //(3+1)d fit configuration
   const int numtoys = 1;
@@ -131,7 +132,7 @@ void HistFactDstTauDemo() {
   RooStats::HistFactory::Measurement meas("my_measurement","my measurement");
   meas.SetOutputFilePrefix("results/my_measurement");
   meas.SetExportOnly(kTRUE); //Tells histfactory to not run the fit and display
-                             //results using its own 
+                             //results using its own
 
   meas.SetPOI("RawRDst");
 
@@ -182,7 +183,7 @@ void HistFactDstTauDemo() {
   sigmu.AddNormFactor("Nmu", expMu, 1e-6, 1e6);
   sigmu.AddNormFactor("mcNorm_sigmu", mcN_sigmu, 1e-9, 1.);
   chan.AddSample(sigmu);
-  
+
   /************************* B0->D*taunu (SIGNAL) *******************************/
 
   RooStats::HistFactory::Sample sigtau("h_sigtau","h_sigtau", "DemoHistos.root");
@@ -199,7 +200,7 @@ void HistFactDstTauDemo() {
   sigtau.AddNormFactor("RawRDst",expTau,1e-6,0.2);
   sigtau.AddNormFactor("mcNorm_sigtau", mcN_sigtau, 1e-9, 1.);
   chan.AddSample(sigtau);
-  
+
   /************************* B0->D1munu **************************************/
 
   RooStats::HistFactory::Sample d1mu("h_D1","h_D1", "DemoHistos.root");
@@ -254,17 +255,17 @@ void HistFactDstTauDemo() {
 
   RooWorkspace *w;
   w=RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
-  
+
   ModelConfig *mc = (ModelConfig*) w->obj("ModelConfig"); // Get model manually
   RooSimultaneous *model = (RooSimultaneous*)mc->GetPdf();
 
   PiecewiseInterpolation *theIW = (PiecewiseInterpolation*) w->obj("h_D1_Dstmu_kinematic_Hist_alpha");
   //theIW->disableCache(kTRUE);
   theIW->Print("V");
-  
+
 
   RooRealVar* poi = (RooRealVar*) mc->GetParametersOfInterest()->createIterator()->Next();
-  std::cout << "Param of Interest: " << poi->GetName() << std::endl;  
+  std::cout << "Param of Interest: " << poi->GetName() << std::endl;
 
 
   // Lets tell roofit the right names for our histogram variables //
@@ -283,7 +284,7 @@ void HistFactDstTauDemo() {
 
   RooCategory *idx = (RooCategory*) obs->find("channelCat");
   RooAbsData *data = (RooAbsData*) w->data("obsData");
-  
+
 
   /* FIX SOME MODEL PARAMS */
   for(int i =0; i < 3; i++){
@@ -299,7 +300,7 @@ void HistFactDstTauDemo() {
   ((RooRealVar*)(mc->GetNuisanceParameters()->find("fD1")))->setConstant(kTRUE);
   ((RooRealVar*)(mc->GetNuisanceParameters()->find("NmisID")))->setConstant(kTRUE);
 
-  if(useDststShapeUncerts) ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_IW")))->setRange(-3.0,3.0);  
+  if(useDststShapeUncerts) ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_IW")))->setRange(-3.0,3.0);
   if(useMuShapeUncerts) ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_v1mu")))->setRange(-8,8);
   if(useMuShapeUncerts) ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_v2mu")))->setRange(-8,8);
   if(useMuShapeUncerts) ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_v3mu")))->setRange(-8,8);
@@ -322,15 +323,15 @@ void HistFactDstTauDemo() {
       ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_IW")))->setVal(-0.005);//-2.187);
       ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_IW")))->setConstant(kTRUE);
     }
-  
+
   // This switches the model to a class written to handle analytic Barlow-Beeston lite.
   // Otherwise, every bin gets a minuit variable to minimize over!
   // This class, on the other hand, allows a likelihood where the bin parameters
   // are analyitically minimized at each step
   HistFactorySimultaneous* model_hf = new HistFactorySimultaneous( *model );
- 
+
   RooFitResult *toyresult;
-  RooAbsReal *nll_hf; 
+  RooAbsReal *nll_hf;
 
   RooFitResult *result, *result2;
 
@@ -386,10 +387,10 @@ void HistFactDstTauDemo() {
               ((RooRealVar*)(mc->GetNuisanceParameters()->find("alpha_IW")))->setVal(0.2);//-2.187);
             }
         }
-  
+
 
       w->saveSnapshot("GENPARS",*allpars,kTRUE);
-      
+
       RooDataSet* datanom;
       cerr << "Attempting to generate toyMC..." << endl;
       sw2.Reset();
@@ -399,7 +400,7 @@ void HistFactDstTauDemo() {
       for (int runnum =0; runnum<numtoys ; runnum++)
         {
           w->loadSnapshot("GENPARS");
-          cerr << "DEBUG CHECK: Ntau=" << poi->getVal() << endl; 
+          cerr << "DEBUG CHECK: Ntau=" << poi->getVal() << endl;
           cout << "PROGRESS: SAMPLE NUMBER " << runnum << " STARTING GENERATION... " << endl;
           RooDataSet* data2 = model->generate(RooArgSet(*x,*y,*z,model->indexCat()),Name("test"),AllBinned(),NumEvents(toysize),Extended());
           double wsum=0.;
@@ -427,7 +428,7 @@ void HistFactDstTauDemo() {
           RooFitResult *testresult = minuit_toy->save("TOY","TOY");
           result=testresult;
           double edm=testresult->edm();
-          if(edm > 0.1) 
+          if(edm > 0.1)
             {
               cout << "BAD FIT. SKIPPING..." << endl;
               continue;
@@ -436,7 +437,7 @@ void HistFactDstTauDemo() {
           toyminos->add(*theVars);
           delete minuit_toy;
           delete nll_hf;
-          if(runnum+1<numtoys) 
+          if(runnum+1<numtoys)
             {
               delete data2;
               delete testresult;
@@ -519,7 +520,7 @@ void HistFactDstTauDemo() {
 
         gROOT->ProcessLine(".q");
       */
-        
+
     }
 
   RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
@@ -555,9 +556,9 @@ void HistFactDstTauDemo() {
       printf("Stat error on R(D*) is %f\n",poi->getError());
 
       printf("EDM at end was %f\n",result->edm());
-      
+
       result->floatParsInit().Print();
-      
+
       cout << "CURRENT NUISANCE PARAMETERS:" << endl;
       //TIterator *paramiter = mc->GetNuisanceParameters()->createIterator();
       TIterator *paramiter = result->floatParsFinal().createIterator();
@@ -579,17 +580,17 @@ void HistFactDstTauDemo() {
           final_par_counter++;
           __temp=(RooRealVar *)paramiter->Next();
         }
-      
-      
+
+
       result->correlationMatrix().Print();
-    
+
       if (dofit) printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",sw.RealTime(), sw3.RealTime());
       //theIW->_cacheMgr.Print("V");
       //w->Print();
       //return;
       //gROOT->ProcessLine(".q");
     }
-  if (toyMC) 
+  if (toyMC)
     {
       printf("Stopwatch: Generated test data in %f seconds\n",sw2.RealTime());
 
@@ -605,8 +606,8 @@ void HistFactDstTauDemo() {
                               ,"Misidentification BKG"
                               ,"Wrong-sign slow #pi"
   };
-      
-      
+
+
   RooHist* mm2resid;// = mm2_frame->pullHist() ;
   RooHist* Elresid;// = El_frame->pullHist() ;
   RooHist* q2resid;// = q2_frame->pullHist() ;
@@ -622,14 +623,14 @@ void HistFactDstTauDemo() {
     resids[i]=drawframes[i]->pullHist();
     data->plotOn(drawframes[i],DataError(RooAbsData::Poisson),Cut("channelCat==0"),MarkerSize(0.4),DrawOption("ZP"));
 
-        
+
   }
 
 
   mm2resid=resids[0];
   Elresid=resids[1];
   q2resid=resids[2];
-     
+
   char cutstrings[q2_bins][128];
   char rangenames[q2_bins][32];
   char rangelabels[q2_bins][128];
@@ -655,11 +656,11 @@ void HistFactDstTauDemo() {
           data->plotOn(Elq2_frame[i],Cut(cutstrings[i]),DataError(RooAbsData::Poisson),MarkerSize(0.4),DrawOption("ZP"));
           model_hf->plotOn(mm2q2_frame[i], Slice(*idx),ProjWData(*idx,*data),ProjectionRange(rangenames[i]),DrawOption("F"),FillColor(kRed));
           model_hf->plotOn(Elq2_frame[i], Slice(*idx),ProjWData(*idx,*data),ProjectionRange(rangenames[i]), DrawOption("F"),FillColor(kRed));
-          
+
           //Grab pulls
           mm2q2_pulls[i]=mm2q2_frame[i]->pullHist();
           Elq2_pulls[i]=Elq2_frame[i]->pullHist();
-          
+
           model_hf->plotOn(mm2q2_frame[i], Slice(*idx),ProjWData(*idx,*data),ProjectionRange(rangenames[i]),DrawOption("F"),FillColor(kViolet),Components("*sigmu*,*D1*,*misID*"));
           model_hf->plotOn(Elq2_frame[i], Slice(*idx),ProjWData(*idx,*data),ProjectionRange(rangenames[i]), DrawOption("F"),FillColor(kViolet),Components("*sigmu*,*D1*,*misID*"));
           model_hf->plotOn(mm2q2_frame[i], Slice(*idx),ProjWData(*idx,*data),ProjectionRange(rangenames[i]),DrawOption("F"),FillColor(kBlue+1),Components("*sigmu*,*misID*"));
@@ -734,7 +735,7 @@ void HistFactDstTauDemo() {
   t->DrawLatex(11.1e6,q2_frame->GetMaximum()*0.95,"Demo");
 
 
-  
+
   RooPlot *mm2_resid_frame=x->frame(Title("mm2"));
   RooPlot *El_resid_frame=y->frame(Title("El"));
   RooPlot *q2_resid_frame=z->frame(Title("q2"));
@@ -775,7 +776,7 @@ void HistFactDstTauDemo() {
           sprintf(thename,"bottompad_%d",k);
           //c2->cd((k<q2_bins)*(2*k+1)+(k>=q2_bins)*(2*(k+1-q2_bins)));
           TPad *padbottom = new TPad(thename,thename,0.,0.,1.,0.3);
-          
+
           padbottom->SetFillColor(0);
           padbottom->SetGridy();
           padbottom->SetTickx();
@@ -788,7 +789,7 @@ void HistFactDstTauDemo() {
           padbottom->SetRightMargin(0.04);
           //padbottom->SetBottomMargin(padbottom->GetBottomMargin()+0.23);
           padbottom->SetBottomMargin(0.5);
-          
+
           //c2b->cd(k+1);
           TH1 *temphist2lo, *temphist2, *tempdathist;
           RooHist * temphist;
@@ -819,9 +820,9 @@ void HistFactDstTauDemo() {
           t->DrawLatex(xloc,-2,"-2");
           //t->DrawLatex(xloc,0," 0");
           t->DrawLatex(xloc*0.99,2," 2");
-       
-          
-          
+
+
+
           c2->cd(k+1);
           //c2->cd((k<q2_bins)*(2*k+1)+(k>=q2_bins)*(2*(k+1-q2_bins)));
           sprintf(thename,"toppad_%d",k);
@@ -871,7 +872,7 @@ void HistFactDstTauDemo() {
 
 
         }
-      
+
     }
   cerr << data->sumEntries() << '\t' << model_hf->expectedEvents(RooArgSet(*x,*y,*z,*idx)) << endl;
 
