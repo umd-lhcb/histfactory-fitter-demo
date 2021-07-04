@@ -1,5 +1,5 @@
 {
-  description = "A demo for HistFactory fits w/ Phoebe's patch.";
+  description = "Phoebe's demo R(D*) HistFactory fitter";
 
   inputs = {
     root-curated.url = "github:umd-lhcb/root-curated";
