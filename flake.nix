@@ -29,7 +29,7 @@
           ];
 
           shellHook = ''
-            alias fmtall="clang-format-all ./src"
+            export PATH=$(pwd)/tools:$PATH
           '';
         };
       });

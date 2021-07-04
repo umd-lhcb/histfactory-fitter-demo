@@ -59,3 +59,9 @@ Here we list the time used to fit running on various systems.
     ```shell
     sysctl -a | grep machdep.cpu.brand
     ```
+
+
+## Coding convention
+
+It is recommended that before you commit, run `fmtall` so that all C++ code are
+formatted in a consistent way.
