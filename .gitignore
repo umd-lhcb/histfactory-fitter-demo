@@ -1,5 +1,6 @@
 gen
 results
+logs
 .direnv
 
 .lvimrc

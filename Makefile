@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sun Jul 04, 2021 at 02:42 AM +0200
+# Last Change: Sun Jul 04, 2021 at 04:32 AM +0200
 
 export PATH := gen:$(PATH)
 
@@ -24,4 +24,4 @@ clean:
 	@rm -rf ./results
 
 fit: HistFactDstTauDemo
-	@HistFactDstTauDemo ./inputs ./gen 2>&1 | tee ./gen/fit.log
+	@HistFactDstTauDemo ./inputs ./gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
