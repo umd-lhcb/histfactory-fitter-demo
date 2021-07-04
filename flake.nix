@@ -21,8 +21,8 @@
           buildInputs = with pkgs; [
             clang-tools # For clang-format
             #root
-            #root_6_12_06
-            root_5_34_38
+            root_6_12_06
+            #root_5_34_38
           ];
         };
       });
