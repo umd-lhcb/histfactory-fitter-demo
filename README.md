@@ -1,5 +1,5 @@
 # histfactory-fitter-demo
-Phoebe's demo R(D*) HistFactory fitter.
+Phoebe's demo R(D*) HistFactory fitter. For more info, take a look at [this TWiki](https://twiki.cern.ch/twiki/bin/viewauth/LHCbPhysics/HistFactoryInfo).
 
 
 ## How to run this demo
@@ -16,7 +16,7 @@ Phoebe's demo R(D*) HistFactory fitter.
 
 1. Run `make clean`.
 
-    **Note**: This will delete everything inside `gen` and the `results` folder
+    **Note**: This will delete everything inside `gen` and the `results` folder.
 
 2. Edit `flake.nix` to pick the ROOT version you want to use:
 
@@ -31,4 +31,29 @@ Phoebe's demo R(D*) HistFactory fitter.
         #root_5_34_38
       ];
     ```
-3. Repeat the processed described in [the previous section](#how-to-run-this-demo)
+3. Repeat the processed described in [the previous section](#how-to-run-this-demo).
+
+
+## Benchmarks
+
+Here we list the time used to fit running on various systems.
+
+| OS | CPU model | ROOT version | Fit time [s] | Prep time [s] |
+|---|---|---|---|---|
+| Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.12.06` | `68.30` | `99.42` |
+| Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `5.34.38` | `70.15` | `104.99` |
+
+
+### Find your CPU model name
+
+- For Linux:
+
+    ```shell
+    cat /proc/cpuinfo | grep "model name"
+    ```
+
+- For macOS:
+
+    ```shell
+    sysctl -a | grep machdep.cpu.brand
+    ```
