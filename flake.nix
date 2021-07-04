@@ -20,10 +20,17 @@
           name = "histfactory-fitter-demo";
           buildInputs = with pkgs; [
             clang-tools # For clang-format
+            clang-format-all
+
+            # Pick your favorite version of ROOT here
             #root
             root_6_12_06
             #root_5_34_38
           ];
+
+          shellHook = ''
+            alias fmtall="clang-format-all ./src"
+          '';
         };
       });
 }
