@@ -42,6 +42,8 @@ Here we list the time used to fit running on various systems.
 |---|---|---|---|---|
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.12.06` | `68.30` | `99.42` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `5.34.38` | `70.15` | `104.99` |
+| Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.12.06` | `73.29` | `89.97` |
+| Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `5.34.38` | `72.81` | `90.75` |
 
 
 ### Find your CPU model name
