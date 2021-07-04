@@ -45,13 +45,17 @@
 #include "RooStats/HistFactory/HistFactoryModelUtils.h"
 #include "RooStats/HistFactory/RooBarlowBeestonLL.h"
 
+// Basic ROOT headers
+#include <TString.h>
+
+
 #define UNBLIND
 
 using namespace std;
 
 TDatime *date = new TDatime();
 
-void HistFactDstTauDemo() {
+void HistFactDstTauDemo(TString inputDir, TString outputDir) {
   using namespace RooFit;
   TLatex *t=new TLatex();
   t->SetTextAlign(22);
@@ -72,8 +76,9 @@ void HistFactDstTauDemo() {
   // Below: Read histogram file to generate normalization constants required to make
   // each histo normalized to unity. Not totally necessary here, but convenient
 
+  TString inputFile = inputDir + "/" + "DemoHistos.root";
 
-  TFile q("DemoHistos.root");
+  TFile q(inputFile);
   TH1 *htemp;
   TString mchistos[3]={"sigmu","sigtau",
                        "D1"
@@ -163,7 +168,7 @@ void HistFactDstTauDemo() {
 
 
   // tell histfactory what data to use
-  chan.SetData("h_data", "DemoHistos.root");
+  chan.SetData("h_data", inputFile.Data());
 
 
   // Now that data is set up, start creating our samples
@@ -171,12 +176,12 @@ void HistFactDstTauDemo() {
 
   /*********************** B0->D*munu (NORM) *******************************/
 
-  RooStats::HistFactory::Sample sigmu("h_sigmu","h_sigmu", "DemoHistos.root");
+  RooStats::HistFactory::Sample sigmu("h_sigmu","h_sigmu", inputFile.Data());
   if(useMuShapeUncerts)
     {
-      sigmu.AddHistoSys("v1mu","h_sigmu_v1m","DemoHistos.root","","h_sigmu_v1p","DemoHistos.root","");
-      sigmu.AddHistoSys("v2mu","h_sigmu_v2m","DemoHistos.root","","h_sigmu_v2p","DemoHistos.root","");
-      sigmu.AddHistoSys("v3mu","h_sigmu_v3m","DemoHistos.root","","h_sigmu_v3p","DemoHistos.root","");
+      sigmu.AddHistoSys("v1mu","h_sigmu_v1m",inputFile.Data(),"","h_sigmu_v1p",inputFile.Data(),"");
+      sigmu.AddHistoSys("v2mu","h_sigmu_v2m",inputFile.Data(),"","h_sigmu_v2p",inputFile.Data(),"");
+      sigmu.AddHistoSys("v3mu","h_sigmu_v3m",inputFile.Data(),"","h_sigmu_v3p",inputFile.Data(),"");
     }
   if(BBon3d) sigmu.ActivateStatError();
   sigmu.SetNormalizeByTheory(kFALSE);
@@ -186,13 +191,13 @@ void HistFactDstTauDemo() {
 
   /************************* B0->D*taunu (SIGNAL) *******************************/
 
-  RooStats::HistFactory::Sample sigtau("h_sigtau","h_sigtau", "DemoHistos.root");
+  RooStats::HistFactory::Sample sigtau("h_sigtau","h_sigtau", inputFile.Data());
   if(useTauShapeUncerts)
     {
-      sigtau.AddHistoSys("v1mu","h_sigtau_v1m","DemoHistos.root","","h_sigtau_v1p","DemoHistos.root","");
-      sigtau.AddHistoSys("v2mu","h_sigtau_v2m","DemoHistos.root","","h_sigtau_v2p","DemoHistos.root","");
-      sigtau.AddHistoSys("v3mu","h_sigtau_v3m","DemoHistos.root","","h_sigtau_v3p","DemoHistos.root","");
-      sigtau.AddHistoSys("v4tau","h_sigtau_v4m","DemoHistos.root","","h_sigtau_v4p","DemoHistos.root","");
+      sigtau.AddHistoSys("v1mu","h_sigtau_v1m",inputFile.Data(),"","h_sigtau_v1p",inputFile.Data(),"");
+      sigtau.AddHistoSys("v2mu","h_sigtau_v2m",inputFile.Data(),"","h_sigtau_v2p",inputFile.Data(),"");
+      sigtau.AddHistoSys("v3mu","h_sigtau_v3m",inputFile.Data(),"","h_sigtau_v3p",inputFile.Data(),"");
+      sigtau.AddHistoSys("v4tau","h_sigtau_v4m",inputFile.Data(),"","h_sigtau_v4p",inputFile.Data(),"");
     }
   if(BBon3d) sigtau.ActivateStatError();
   sigtau.SetNormalizeByTheory(kFALSE);
@@ -203,11 +208,11 @@ void HistFactDstTauDemo() {
 
   /************************* B0->D1munu **************************************/
 
-  RooStats::HistFactory::Sample d1mu("h_D1","h_D1", "DemoHistos.root");
+  RooStats::HistFactory::Sample d1mu("h_D1","h_D1", inputFile.Data());
   if(BBon3d) d1mu.ActivateStatError();
   if(useDststShapeUncerts)
     {
-      d1mu.AddHistoSys("IW","h_D1IWp","DemoHistos.root","","h_D1IWm","DemoHistos.root","");
+      d1mu.AddHistoSys("IW","h_D1IWp",inputFile.Data(),"","h_D1IWm",inputFile.Data(),"");
     }
 
   d1mu.SetNormalizeByTheory(kFALSE);
@@ -226,7 +231,7 @@ void HistFactDstTauDemo() {
   chan.AddSample(d1mu);
   /*********************** MisID BKG (FROM DATA)  *******************************/
 
-  RooStats::HistFactory::Sample misID("h_misID","h_misID", "DemoHistos.root");
+  RooStats::HistFactory::Sample misID("h_misID","h_misID", inputFile.Data());
   //if(BBon3d) misID.ActivateStatError();
 
   misID.SetNormalizeByTheory(kTRUE);
@@ -877,17 +882,20 @@ void HistFactDstTauDemo() {
   cerr << data->sumEntries() << '\t' << model_hf->expectedEvents(RooArgSet(*x,*y,*z,*idx)) << endl;
 
   if(c1 != NULL){
-    c1->SaveAs("c1.root");
-    c1->SaveAs("c1.pdf");
+    c1->SaveAs(outputDir + "/" + "c1.root");
+    c1->SaveAs(outputDir + "/" + "c1.pdf");
   }
   if(c2 != NULL){
-    c2->SaveAs("c2.root");
-    c2->SaveAs("c2.pdf");
+    c2->SaveAs(outputDir + "/" "c2.root");
+    c2->SaveAs(outputDir + "/" "c2.pdf");
   }
 }
 
 int main(int, char** argv) {
-  HistFactDstTauDemo();
+  TString inputDir = argv[1];
+  TString outputDir = argv[2];
+
+  HistFactDstTauDemo(inputDir, outputDir);
 
   return 0;
 }
