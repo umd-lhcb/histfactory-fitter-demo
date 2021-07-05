@@ -45,6 +45,8 @@ Here we list the time used to fit running on various systems.
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.12.06` | `73.29` | `89.97` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `5.34.38` | `72.81` | `90.75` |
 | macOS 10.15.7 (Catalina) | `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz` | `6.12.06` | `70.66` | `87.22` |
+| macOS 10.15.7 (Catalina) | `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz` | `5.34.38` | `71.60` | `90.06` |
+
 
 ### Find your CPU model name
 
