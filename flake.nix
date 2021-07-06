@@ -19,7 +19,6 @@
         devShell = pkgs.mkShell {
           name = "histfactory-fitter-demo";
           buildInputs = with pkgs; [
-            clang-tools # For clang-format
             clang-format-all
 
             # Pick your favorite version of ROOT here
