@@ -1,7 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sun Jul 04, 2021 at 04:32 AM +0200
-
-export PATH := gen:$(PATH)
+# Last Change: Tue Jul 06, 2021 at 02:14 AM +0200
 
 VPATH := src:gen
 

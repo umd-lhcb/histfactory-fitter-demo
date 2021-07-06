@@ -28,7 +28,7 @@
           ];
 
           shellHook = ''
-            export PATH=$(pwd)/tools:$PATH
+            export PATH=$(pwd)/gen:$(pwd)/tools:$PATH
           '';
         };
       });
