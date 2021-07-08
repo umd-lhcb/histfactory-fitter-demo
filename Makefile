@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Tue Jul 06, 2021 at 02:14 AM +0200
+# Last Change: Fri Jul 09, 2021 at 12:15 AM +0200
 
 VPATH := src:gen
 
@@ -12,7 +12,7 @@ ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory
 
 HistFactDstTauDemo:
 
-%: %.cpp
+%: %.cpp flake.nix
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
 
 .PHONY: clean fit

@@ -49,11 +49,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1625703193,
-        "narHash": "sha256-S6C1zSVCri+tTTSdV3QmuhPLTLxEFb4AfNjth58MD34=",
+        "lastModified": 1625779066,
+        "narHash": "sha256-mCxLrbvzEDpczF20xIGv8soGX65pghE4RzzPnqszwqs=",
         "owner": "umd-lhcb",
         "repo": "root-curated",
-        "rev": "1d5ccb77d3e23d012e8ed9575e600a9d054a5b69",
+        "rev": "efbadc93ca5204c2400b61d5d35abfa1277198e4",
         "type": "github"
       },
       "original": {
