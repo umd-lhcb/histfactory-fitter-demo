@@ -21,6 +21,9 @@
           buildInputs = with pkgs; [
             clang-format-all
 
+            # Weird UI library dependency required by macOS
+            freetype
+
             # Pick your favorite version of ROOT here
             #root
             root_6_16_00
