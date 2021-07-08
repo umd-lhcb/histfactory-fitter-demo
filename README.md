@@ -51,8 +51,8 @@ Here we list the time used to fit running on various systems.
 | macOS 10.15.7 (Catalina) | `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz` | `5.34.38` | `71.60` | `90.06` |
 | macOS 11.4 (Big Sur) | `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz` | `6.16.00` | `59.85` | `79.18` |
 | macOS 11.4 (Big Sur) | `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz` | `5.34.38` | `60.13` | `83.27` |
-| macOS 11.2.3 (Big Sur) | `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz` | `5.34.38` | `77.52`| `105.19`|
 | macOS 11.2.3 (Big Sur) | `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz` | `6.16.00` | `66.90` | `87.45` |
+| macOS 11.2.3 (Big Sur) | `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz` | `5.34.38` | `77.52` | `105.19` |
 
 ### Find your CPU model name
 
