@@ -40,12 +40,15 @@ Here we list the time used to fit running on various systems.
 
 | OS | CPU model | ROOT version | Fit time [s] | Prep time [s] |
 |---|---|---|---|---|
+| Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.16.00` | `68.71` | `99.54` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.12.06` | `68.30` | `99.42` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `5.34.38` | `70.15` | `104.99` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.12.06` | `73.29` | `89.97` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `5.34.38` | `72.81` | `90.75` |
 | macOS 10.15.7 (Catalina) | `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz` | `6.12.06` | `70.66` | `87.22` |
 | macOS 10.15.7 (Catalina) | `Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz` | `5.34.38` | `71.60` | `90.06` |
+| macOS 11.4 (Big Sur) | `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz` | `6.16.00` | `59.85` | `79.18` |
+| macOS 11.4 (Big Sur) | `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz` | `5.34.38` | `60.13` | `83.27` |
 
 
 ### Find your CPU model name
