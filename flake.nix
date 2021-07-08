@@ -23,7 +23,7 @@
 
             # Pick your favorite version of ROOT here
             #root
-            root_6_12_06
+            root_6_16_00
             #root_5_34_38
           ];
 
