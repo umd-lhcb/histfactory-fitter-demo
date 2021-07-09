@@ -40,9 +40,11 @@ Here we list the time used to fit running on various systems.
 
 | OS | CPU model | ROOT version | Fit time [s] | Prep time [s] |
 |---|---|---|---|---|
+| Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.24.02` | `53.83` | `19.93` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.16.00` | `68.71` | `99.54` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `6.12.06` | `68.30` | `99.42` |
 | Linux (NixOS) | `Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz` | `5.34.38` | `70.15` | `104.99` |
+| Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.24.02` | `62.03` | `13.87` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.16.00` | `74.71` | `92.27` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `6.12.06` | `73.29` | `89.97` |
 | Linux (NixOS) | `AMD Ryzen 7 PRO 4750U with Radeon Graphics` | `5.34.38` | `72.81` | `90.75` |
