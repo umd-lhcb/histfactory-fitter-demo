@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sat Jul 10, 2021 at 02:51 AM +0200
+// Last Change: Sat Jul 10, 2021 at 03:14 AM +0200
 
 #include <string>
 
@@ -8,6 +8,10 @@
 #include <cxxopts.hpp>
 
 using namespace std;
+
+// Declarations
+template <typename T>
+T SUM(T, T);
 
 int main(int argc, char** argv) {
   // Define command line parser
@@ -36,9 +40,19 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  fmt::print("First int param : {}\n", parsed_args["int1"].as<int>());
+  auto int1 = parsed_args["int1"].as<int>();
+  auto int2 = parsed_args["int2"].as<int>();
+
+  fmt::print("First int param : {}\n", int1);
+  fmt::print("Second int param : {}\n", int2);
+  fmt::print("The sum of the two is: {}\n", SUM(int1, int2));
 }
 
 /////////////
 // Helpers //
 /////////////
+
+template <typename T>
+T SUM(T n1, T n2) {
+  return n1 + n2;
+}
