@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sat Jul 10, 2021 at 03:45 AM +0200
+# Last Change: Sat Jul 10, 2021 at 02:36 PM +0200
 
 VPATH := src:gen
 
@@ -26,5 +26,5 @@ args: CmdArgDemo
 	@CmdArgDemo --help
 	@CmdArgDemo --int1 233
 
-%: %.cpp flake.nix
+%: %.cpp flake.nix Makefile
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
