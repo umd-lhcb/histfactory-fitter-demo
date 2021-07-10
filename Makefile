@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sat Jul 10, 2021 at 04:51 PM +0200
+# Last Change: Sat Jul 10, 2021 at 06:17 PM +0200
 
 VPATH := src:gen
 
@@ -25,6 +25,7 @@ fit: inputs/DemoHistos.root HistFactDstTauDemo
 args: CmdArgDemo
 	@CmdArgDemo --help
 	@CmdArgDemo --int1 233
+	@CmdArgDemo -m both_false --flag1
 
 %: %.cpp flake.nix Makefile
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
