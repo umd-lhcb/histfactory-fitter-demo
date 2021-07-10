@@ -19,6 +19,7 @@
         devShell = pkgs.mkShell {
           name = "histfactory-fitter-demo";
           buildInputs = with pkgs; [
+            clang-tools
             clang-format-all
 
             # Third-party build dependencies
