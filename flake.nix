@@ -21,6 +21,10 @@
           buildInputs = with pkgs; [
             clang-format-all
 
+            # Third-party build dependencies
+            cxxopts
+            fmt
+
             # Pick your favorite version of ROOT here
             # ROOT 6.24 stack
             #root_6_24_02
