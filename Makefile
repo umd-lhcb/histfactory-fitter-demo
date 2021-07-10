@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Sat Jul 10, 2021 at 02:52 AM +0200
+# Last Change: Sat Jul 10, 2021 at 03:45 AM +0200
 
 VPATH := src:gen
 
@@ -8,7 +8,7 @@ COMPILER	:=	$(shell root-config --cxx)
 CXXFLAGS	:=	$(shell root-config --cflags)
 LINKFLAGS	:=	$(shell root-config --libs)
 ADDCXXFLAGS	:=	-O2
-ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory -lfmt
+ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory
 
 HistFactDstTauDemo:
 CmdArgDemo:

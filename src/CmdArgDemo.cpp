@@ -1,10 +1,10 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sat Jul 10, 2021 at 03:14 AM +0200
+// Last Change: Sat Jul 10, 2021 at 03:57 AM +0200
 
+#include <iostream>
 #include <string>
 
-#include <fmt/core.h>
 #include <cxxopts.hpp>
 
 using namespace std;
@@ -36,16 +36,16 @@ int main(int argc, char** argv) {
   auto parsed_args = argparse.parse(argc, argv);
 
   if (parsed_args.count("help")) {
-    fmt::print("{}\n", argparse.help());
+    cout << argparse.help() << endl;
     exit(0);
   }
 
   auto int1 = parsed_args["int1"].as<int>();
   auto int2 = parsed_args["int2"].as<int>();
 
-  fmt::print("First int param : {}\n", int1);
-  fmt::print("Second int param : {}\n", int2);
-  fmt::print("The sum of the two is: {}\n", SUM(int1, int2));
+  cout << "First int param : " << int1 << endl;
+  cout << "Second int param : " << int2 << endl;
+  cout << "The sum of the two is: " << SUM(int1, int2) << endl;
 }
 
 /////////////
