@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sat Jul 10, 2021 at 05:00 PM +0200
+// Last Change: Sat Jul 10, 2021 at 06:22 PM +0200
 
 #ifndef _FIT_DEMO_CMD_H_
 #define _FIT_DEMO_CMD_H_
@@ -34,9 +34,8 @@ template <typename T>
 T const ArgProxy<T>::get(std::string const key) {
   // Here we assume the value is not specified explicitly in command line AND a
   // default value for that key in this mode exists
-  if (!m_parsed_args[key].count() && default_exist(m_mode, key)) {
+  if (!m_parsed_args[key].count() && default_exist(m_mode, key))
     return m_default_val[m_mode][key];
-  }
   // Otherwise just let the parser to handle it
   return m_parsed_args[key].template as<T>();
 }
