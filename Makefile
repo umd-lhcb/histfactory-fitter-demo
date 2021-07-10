@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Fri Jul 09, 2021 at 12:15 AM +0200
+# Last Change: Sat Jul 10, 2021 at 02:52 AM +0200
 
 VPATH := src:gen
 
@@ -8,14 +8,12 @@ COMPILER	:=	$(shell root-config --cxx)
 CXXFLAGS	:=	$(shell root-config --cflags)
 LINKFLAGS	:=	$(shell root-config --libs)
 ADDCXXFLAGS	:=	-O2
-ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory
+ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory -lfmt
 
 HistFactDstTauDemo:
+CmdArgDemo:
 
-%: %.cpp flake.nix
-	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
-
-.PHONY: clean fit
+.PHONY: clean fit args
 
 clean:
 	@rm -rf ./gen/*
@@ -23,3 +21,10 @@ clean:
 
 fit: HistFactDstTauDemo
 	@HistFactDstTauDemo ./inputs ./gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+
+args: CmdArgDemo
+	@CmdArgDemo --help
+	@CmdArgDemo --int1 233
+
+%: %.cpp flake.nix
+	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
