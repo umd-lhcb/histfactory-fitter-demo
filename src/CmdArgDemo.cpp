@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sat Jul 10, 2021 at 06:16 PM +0200
+// Last Change: Sun Jul 11, 2021 at 04:20 AM +0200
 
 #include <iostream>
 #include <string>
@@ -31,6 +31,8 @@ int main(int argc, char** argv) {
      ->default_value("314"))
     ("m,mode", "general mode", cxxopts::value<string>()
      ->default_value("both_true"))
+    ("f,filename", "sample filename", cxxopts::value<string>()
+     ->default_value("ntp1.root"))
     ;
   // clang-format on
 
@@ -48,6 +50,9 @@ int main(int argc, char** argv) {
     cout << argparse.help() << endl;
     exit(0);
   }
+
+  auto filename = parsed_args["filename"].as<string>();
+  cout << "Sample filename is: " << filename.c_str() << endl;
 
   auto flag1_raw = parsed_args["flag1"].as<bool>();
   auto flag2_raw = parsed_args["flag2"].as<bool>();
