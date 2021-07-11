@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 11, 2021 at 04:20 AM +0200
+// Last Change: Sun Jul 11, 2021 at 04:23 AM +0200
 
 #include <iostream>
 #include <string>
@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
     ("h,help", "print usage")
     ("d,debug", "enable debugging")  // bool by default
     ("flag1", "first bool param")
-    ("flag2", "second bool param")
+    ("flag2", "second bool param", cxxopts::value<bool>()
+     ->default_value("true"))
     ("int1", "first int param", cxxopts::value<int>()->default_value("42"))
     ("int2", "second int param", cxxopts::value<int>()
      ->default_value("314"))
