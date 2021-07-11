@@ -1,7 +1,8 @@
 # Author: Yipeng Sun
-# Last Change: Sun Jul 11, 2021 at 05:01 PM +0200
+# Last Change: Mon Jul 12, 2021 at 01:51 AM +0200
 
-VPATH := src:gen
+VPATH := include:src:gen
+HEADERS := $(shell find ./include -name "*.h")
 
 # Compiler settings
 COMPILER	:=	$(shell root-config --cxx)
@@ -10,8 +11,8 @@ LINKFLAGS	:=	$(shell root-config --libs)
 ADDCXXFLAGS	:=	-O2 -march=native -mtune=native -Iinclude
 ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory
 
-HistFactDstTauDemo:
-CmdArgDemo: include/cmd.h
+HistFactDstTauDemo: $(HEADERS)
+CmdArgDemo: cmd.h
 
 .PHONY: clean fit args
 
