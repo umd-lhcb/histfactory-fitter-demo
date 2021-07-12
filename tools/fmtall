@@ -2,4 +2,4 @@
 
 ROOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"/..
 
-clang-format-all $ROOTDIR/src
+clang-format-all $ROOTDIR/src $ROOTDIR/include
