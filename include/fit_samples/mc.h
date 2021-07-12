@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 11, 2021 at 10:04 PM +0200
+// Last Change: Mon Jul 12, 2021 at 03:03 AM +0200
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -98,14 +98,14 @@ void add_mc(char* const ntp, RooStats::HistFactory::Channel& chan,
   // Define samples to be added here
   // clang-format off
   auto samples = std::vector<std::function<void(
-      char* const, RooStats::HistFactory::Channel, ArgProxy)>&>{
+      char* const, RooStats::HistFactory::Channel&, ArgProxy)>&>{
     add_mc_norm,
     add_mc_sig,
     add_mc_d_1
   };
   // clang-format on
 
-  for (auto const& f : samples) {
+  for (auto const&& f : samples) {
     f(ntp, chan, params);
   }
 }
