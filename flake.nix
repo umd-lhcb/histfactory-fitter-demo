@@ -27,11 +27,11 @@
 
             # Pick your favorite version of ROOT here
             # ROOT 6.24 stack
-            #root_6_24_02
+            root_6_24_02
 
             # ROOT 6.16 stack
-            root_6_16_00
-            freetype # Weird UI library dependency required by macOS
+            #root_6_16_00
+            #freetype # Weird UI library dependency required by macOS
 
             # ROOT 5.34 stack
             #root_5_34_38
