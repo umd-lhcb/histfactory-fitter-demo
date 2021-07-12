@@ -45,8 +45,19 @@
 #include "RooStats/HistFactory/PiecewiseInterpolation.h"
 #include "RooStats/HistFactory/RooBarlowBeestonLL.h"
 
+// New headers
+#include <any>
+#include <cxxopts.hpp>
+#include <map>
+#include <string>
+
 // Basic ROOT headers
 #include <TString.h>
+
+// HistFactory headers
+
+#include "cmd.h"
+//#include "fit_samples/mc.h"
 
 #define UNBLIND
 
@@ -54,7 +65,7 @@ using namespace std;
 
 TDatime *date = new TDatime();
 
-void HistFactDstTauDemo(TString inputDir, TString outputDir) {
+void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   using namespace RooFit;
   TLatex *t = new TLatex();
   t->SetTextAlign(22);
@@ -77,8 +88,6 @@ void HistFactDstTauDemo(TString inputDir, TString outputDir) {
   // Below: Read histogram file to generate normalization constants required to
   // make each histo normalized to unity. Not totally necessary here, but
   // convenient
-
-  TString inputFile = inputDir + "/" + "DemoHistos.root";
 
   TFile   q(inputFile);
   TH1 *   htemp;
@@ -950,11 +959,81 @@ void HistFactDstTauDemo(TString inputDir, TString outputDir) {
   }
 }
 
-int main(int, char **argv) {
-  TString inputDir  = argv[1];
-  TString outputDir = argv[2];
+//////////
+// Main //
+//////////
 
-  HistFactDstTauDemo(inputDir, outputDir);
+int main(int argc, char **argv) {
+  cxxopts::Options argparse("HistFactDstTauDemo",
+                            "a demo R(D*) HistFactory fitter.");
+
+  // clang-format off
+  argparse.add_options()
+    ("h,help", "print usage")
+    ("i,inputFile", "input fit templates", cxxopts::value<string>())
+    ("o,outputDir", "output directory", cxxopts::value<string>())
+    ("m,mode", "fitter mode", cxxopts::value<string>()
+     ->default_value("fullFit"))
+    ////
+    ("constrainDstst", "constrain D** normalization")
+    ("useMinos", "?")
+    ("useMuShapeUncerts", "constrain normalization shape")
+    ("useTauShapeUncerts", "constrain signal shape")
+    ("useDststShapeUncerts", "constrain D** shape")
+    ////
+    ("fixShapes", "?")
+    ("fixShapesDstst", "?")
+    ("bbOn3D", "enable Barlow-Beeston procedure for all histograms")
+    ////
+    ("doFit", "perform a fit")
+    ////
+    ("doToyMC", "perform a toy MC study")
+    ("fitFirst", "fit before generate toy MC")
+    ("numToys", "number of toy MC sample to generate", cxxopts::value<int>()
+     ->default_value("1"))
+    ("toySize", "size of the generated toy MC", cxxopts::value<int>()
+     ->default_value("384236"))
+    ////
+    ("slowPlots", "use the slower plotting method")
+    ////
+    ("expTau", "?", cxxopts::value<double>()
+     ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
+    ("expMu", "?", cxxopts::value<double>()
+     ->default_value("50e3"))
+    ;
+  // clang-format on
+
+  auto parsed_args = argparse.parse(argc, argv);
+  auto mode        = parsed_args["mode"].as<string>();
+
+  // Define default values for modes
+  auto parsed_args_proxy = ArgProxy(parsed_args, mode);
+  // clang-format off
+  parsed_args_proxy.set_default("fullFit", map<string, any>{
+      {"constrainDstst", true},
+      {"useMinos", true},
+      {"useMuShapeUncerts", true},
+      {"useTauShapeUncerts", true},
+      {"useDststShapeUncerts", true},
+      {"fixShapes", false},
+      {"fixShapesDstst", false},
+      {"bbOn3D", true},
+      {"doFit", true},
+      {"doToyMC", false},
+      {"fitFirst", false},
+      {"slowPlots", true}
+  });
+  // clang-format on
+
+  if (parsed_args.count("help")) {
+    cout << argparse.help() << endl;
+    exit(0);
+  }
+
+  auto inputFile = TString(parsed_args["inputFile"].as<string>());
+  auto outputDir = TString(parsed_args["outputDir"].as<string>());
+
+  HistFactDstTauDemo(inputFile, outputDir, parsed_args_proxy);
 
   return 0;
 }
