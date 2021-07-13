@@ -57,6 +57,7 @@
 // HistFactory headers
 
 #include "cmd.h"
+#include "plot.h"
 //#include "fit_samples/mc.h"
 
 #define UNBLIND
@@ -67,16 +68,6 @@ TDatime *date = new TDatime();
 
 void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   using namespace RooFit;
-  TLatex *t = new TLatex();
-  t->SetTextAlign(22);
-  t->SetTextSize(0.06);
-  t->SetTextFont(132);
-  gROOT->ProcessLine("gStyle->SetLabelFont(132,\"xyz\");");
-  gROOT->ProcessLine("gStyle->SetTitleFont(132,\"xyz\");");
-  gROOT->ProcessLine("gStyle->SetTitleFont(132,\"t\");");
-  gROOT->ProcessLine("gStyle->SetTitleSize(0.08,\"t\");");
-  gROOT->ProcessLine("gStyle->SetTitleY(0.970);");
-  char substr[128];
   RooRandom::randomGenerator()->SetSeed(date->Get() % 100000);
   cout << date->Get() % 100000
        << endl;  // For ToyMC, so I can run multiple copies
@@ -162,9 +153,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // ISOLATED FULL RANGE NONN
   //*
   const double expTau = 0.252 * 0.1742 * 0.781 / 0.85;
-  const double e_iso  = 0.314;
   double       expMu  = 50e3;
-  // 8*/
 
   double RelLumi = 1.00;
 
@@ -563,28 +552,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     */
   }
 
-  RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
-  RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
-  RooPlot *q2_frame  = z->frame(Title("q^{2}"));
-  RooPlot *mm2q2_frame[q2_bins];
-  RooPlot *Elq2_frame[q2_bins];
-
-  const int nframes             = 3;
-  RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
-  RooPlot * q2frames[2 * q2_bins];
-  RooPlot * q2bframes[2 * q2_bins];
-
-  for (int i = 0; i < q2_bins; i++) {
-    mm2q2_frame[i]         = x->frame();
-    Elq2_frame[i]          = y->frame();
-    q2frames[i]            = mm2q2_frame[i];
-    q2frames[i + q2_bins]  = Elq2_frame[i];
-    q2bframes[i]           = x->frame();
-    q2bframes[i + q2_bins] = y->frame();
-  }
-
-  const int ncomps = 10;
-
   if (result != NULL) {
     printf("Fit ran with status %d\n", result->status());
 
@@ -630,19 +597,40 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   if (toyMC) {
     printf("Stopwatch: Generated test data in %f seconds\n", sw2.RealTime());
   }
-  int       colors[ncomps] = {kRed,        kBlue + 1,  kViolet,    kViolet + 1,
-                        kViolet + 2, kGreen,     kGreen + 1, kOrange + 1,
-                        kOrange + 2, kOrange + 3};
-  const int ncomps2        = 8;
-  TString   names[ncomps2 + 1] = {"Data",
-                                "Total Fit",
-                                "B #rightarrow D*#mu#nu",
-                                "B #rightarrow D**#mu#nu",
-                                "B #rightarrow D**#tau#nu",
-                                "B #rightarrow D*[D_{q} #rightarrow #mu#nuX]Y",
-                                "Combinatoric (wrong-sign)",
-                                "Misidentification BKG",
-                                "Wrong-sign slow #pi"};
+
+  ///////////
+  // Plots //
+  ///////////
+  set_global_plot_style();
+  auto t = make_label();
+
+  RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
+  RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
+  RooPlot *q2_frame  = z->frame(Title("q^{2}"));
+
+  // Slow plot related stuff
+  RooPlot *mm2q2_frame[q2_bins];
+  RooPlot *Elq2_frame[q2_bins];
+
+  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
+  RooPlot *El_resid_frame  = y->frame(Title("El"));
+  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
+
+  const int nframes             = 3;
+  RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
+  RooPlot * q2frames[2 * q2_bins];
+  RooPlot * q2bframes[2 * q2_bins];
+
+  for (int i = 0; i < q2_bins; i++) {
+    mm2q2_frame[i]         = x->frame();
+    Elq2_frame[i]          = y->frame();
+    q2frames[i]            = mm2q2_frame[i];
+    q2frames[i + q2_bins]  = Elq2_frame[i];
+    q2bframes[i]           = x->frame();
+    q2bframes[i + q2_bins] = y->frame();
+  }
+
+  const int ncomps = 10;
 
   RooHist *mm2resid;  // = mm2_frame->pullHist() ;
   RooHist *Elresid;   // = El_frame->pullHist() ;
@@ -739,91 +727,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
                    DrawOption("ZP"));
     }
   }
-  TCanvas *c1 = new TCanvas("c1", "c1", 1000, 300);
-  c1->SetTickx();
-  c1->SetTicky();
-  c1->Divide(3, 1);
-  TVirtualPad *curpad;
-  curpad = c1->cd(1);
-  curpad->SetTickx();
-  curpad->SetTicky();
-  curpad->SetRightMargin(0.02);
-  curpad->SetLeftMargin(0.20);
-  curpad->SetTopMargin(0.02);
-  curpad->SetBottomMargin(0.13);
-  mm2_frame->SetTitle("");
-  mm2_frame->GetXaxis()->SetLabelSize(0.06);
-  mm2_frame->GetXaxis()->SetTitleSize(0.06);
-  mm2_frame->GetYaxis()->SetLabelSize(0.06);
-  mm2_frame->GetYaxis()->SetTitleSize(0.06);
-  mm2_frame->GetYaxis()->SetTitleOffset(1.75);
-  mm2_frame->GetXaxis()->SetTitleOffset(0.9);
-  TString thetitle = mm2_frame->GetYaxis()->GetTitle();
-  thetitle.Replace(0, 6, "Candidates");
-  mm2_frame->GetYaxis()->SetTitle(thetitle);
-  mm2_frame->Draw();
-  t->DrawLatex(8.7, mm2_frame->GetMaximum() * 0.95, "Demo");
-  curpad = c1->cd(2);
-  curpad->SetTickx();
-  curpad->SetTicky();
-  curpad->SetRightMargin(0.02);
-  curpad->SetLeftMargin(0.20);
-  curpad->SetTopMargin(0.02);
-  curpad->SetBottomMargin(0.13);
-  El_frame->SetTitle("");
-  El_frame->GetXaxis()->SetLabelSize(0.06);
-  El_frame->GetXaxis()->SetTitleSize(0.06);
-  El_frame->GetYaxis()->SetLabelSize(0.06);
-  El_frame->GetYaxis()->SetTitleSize(0.06);
-  El_frame->GetYaxis()->SetTitleOffset(1.75);
-  El_frame->GetXaxis()->SetTitleOffset(0.9);
-  thetitle = El_frame->GetYaxis()->GetTitle();
-  thetitle.Replace(0, 6, "Candidates");
-  El_frame->GetYaxis()->SetTitle(thetitle);
-  El_frame->Draw();
-  t->DrawLatex(2250, El_frame->GetMaximum() * 0.95, "Demo");
-  curpad = c1->cd(3);
-  curpad->SetTickx();
-  curpad->SetTicky();
-  curpad->SetRightMargin(0.02);
-  curpad->SetLeftMargin(0.20);
-  curpad->SetTopMargin(0.02);
-  curpad->SetBottomMargin(0.13);
-  q2_frame->SetTitle("");
-  q2_frame->GetXaxis()->SetLabelSize(0.06);
-  q2_frame->GetXaxis()->SetTitleSize(0.06);
-  q2_frame->GetYaxis()->SetLabelSize(0.06);
-  q2_frame->GetYaxis()->SetTitleSize(0.06);
-  q2_frame->GetYaxis()->SetTitleOffset(1.75);
-  q2_frame->GetXaxis()->SetTitleOffset(0.9);
-  thetitle = q2_frame->GetYaxis()->GetTitle();
-  thetitle.Replace(0, 6, "Candidates");
-  q2_frame->GetYaxis()->SetTitle(thetitle);
-  q2_frame->Draw();
-  t->DrawLatex(11.1e6, q2_frame->GetMaximum() * 0.95, "Demo");
 
-  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
-  RooPlot *El_resid_frame  = y->frame(Title("El"));
-  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
-  RooPlot *DOCA_resid_frame;
-  /*
-    cerr << __LINE__ << endl;
-    mm2_resid_frame->addPlotable(mm2resid,"P");
-    cerr << __LINE__ << endl;
-    El_resid_frame->addPlotable(Elresid,"P");
-    cerr << __LINE__ << endl;
-    q2_resid_frame->addPlotable(q2resid,"P");
-    cerr << __LINE__ << endl;
-
-    TCanvas *c3 = new TCanvas("c3","c3",640,1000);
-    c3->Divide(1,3);
-    c3->cd(1);
-    mm2_resid_frame->Draw();
-    c3->cd(2);
-    El_resid_frame->Draw();
-    c3->cd(3);
-    q2_resid_frame->Draw();
-  */
   TCanvas *c2;
   if (slowplots == true) {
     c2 = new TCanvas("c2", "c2", 1200, 600);
@@ -949,14 +853,19 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   cerr << data->sumEntries() << '\t'
        << model_hf->expectedEvents(RooArgSet(*x, *y, *z, *idx)) << endl;
 
-  if (c1 != NULL) {
-    c1->SaveAs(outputDir + "/" + "c1.root");
-    c1->SaveAs(outputDir + "/" + "c1.pdf");
-  }
   if (c2 != NULL) {
     c2->SaveAs(outputDir + "/" + "c2.root");
     c2->SaveAs(outputDir + "/" + "c2.pdf");
   }
+
+  // Plot fit variables
+  cout << "Plot fit variables..." << endl;
+  auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
+  auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
+
+  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300, t.get());
+  c1->SaveAs(outputDir + "/" + "c1.root");
+  c1->SaveAs(outputDir + "/" + "c1.pdf");
 }
 
 //////////
