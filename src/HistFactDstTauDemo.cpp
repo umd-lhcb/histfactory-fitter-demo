@@ -44,12 +44,13 @@
 #include "RooStats/HistFactory/ParamHistFunc.h"
 #include "RooStats/HistFactory/PiecewiseInterpolation.h"
 #include "RooStats/HistFactory/RooBarlowBeestonLL.h"
+////
 
-// New headers
 #include <any>
 #include <cxxopts.hpp>
 #include <map>
 #include <string>
+#include <iostream>
 
 // Basic ROOT headers
 #include <TString.h>
@@ -601,42 +602,26 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   ///////////
   // Plots //
   ///////////
+
   set_global_plot_style();
   auto t = make_label();
 
+  // Plot fit variables
   RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
   RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
   RooPlot *q2_frame  = z->frame(Title("q^{2}"));
 
-  // Slow plot related stuff
-  RooPlot *mm2q2_frame[q2_bins];
-  RooPlot *Elq2_frame[q2_bins];
-
-  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
-  RooPlot *El_resid_frame  = y->frame(Title("El"));
-  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
-
   const int nframes             = 3;
   RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
-  RooPlot * q2frames[2 * q2_bins];
-  RooPlot * q2bframes[2 * q2_bins];
 
-  for (int i = 0; i < q2_bins; i++) {
-    mm2q2_frame[i]         = x->frame();
-    Elq2_frame[i]          = y->frame();
-    q2frames[i]            = mm2q2_frame[i];
-    q2frames[i + q2_bins]  = Elq2_frame[i];
-    q2bframes[i]           = x->frame();
-    q2bframes[i + q2_bins] = y->frame();
-  }
-
-  const int ncomps = 10;
-
+  RooHist *resids[nframes];
   RooHist *mm2resid;  // = mm2_frame->pullHist() ;
   RooHist *Elresid;   // = El_frame->pullHist() ;
   RooHist *q2resid;   // = q2_frame->pullHist() ;
 
-  RooHist *resids[nframes];
+  mm2resid = resids[0];
+  Elresid  = resids[1];
+  q2resid  = resids[2];
 
   for (int i = 0; i < nframes; i++) {
     data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
@@ -657,9 +642,35 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
                  Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
   }
 
-  mm2resid = resids[0];
-  Elresid  = resids[1];
-  q2resid  = resids[2];
+  cout << "Plot fit variables..." << endl;
+  auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
+  auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
+
+  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300, t.get());
+  c1->SaveAs(outputDir + "/" + "c1.root");
+  c1->SaveAs(outputDir + "/" + "c1.pdf");
+
+  // Slow plot related stuff
+  RooPlot *mm2q2_frame[q2_bins];
+  RooPlot *Elq2_frame[q2_bins];
+
+  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
+  RooPlot *El_resid_frame  = y->frame(Title("El"));
+  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
+
+  RooPlot * q2frames[2 * q2_bins];
+  RooPlot * q2bframes[2 * q2_bins];
+
+  for (int i = 0; i < q2_bins; i++) {
+    mm2q2_frame[i]         = x->frame();
+    Elq2_frame[i]          = y->frame();
+    q2frames[i]            = mm2q2_frame[i];
+    q2frames[i + q2_bins]  = Elq2_frame[i];
+    q2bframes[i]           = x->frame();
+    q2bframes[i + q2_bins] = y->frame();
+  }
+
+  const int ncomps = 10;
 
   char     cutstrings[q2_bins][128];
   char     rangenames[q2_bins][32];
@@ -857,15 +868,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     c2->SaveAs(outputDir + "/" + "c2.root");
     c2->SaveAs(outputDir + "/" + "c2.pdf");
   }
-
-  // Plot fit variables
-  cout << "Plot fit variables..." << endl;
-  auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
-  auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
-
-  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300, t.get());
-  c1->SaveAs(outputDir + "/" + "c1.root");
-  c1->SaveAs(outputDir + "/" + "c1.pdf");
 }
 
 //////////
@@ -873,6 +875,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 //////////
 
 int main(int argc, char **argv) {
+  // Parser ////////////////////////////////////////////////////////////////////
   cxxopts::Options argparse("HistFactDstTauDemo",
                             "a demo R(D*) HistFactory fitter.");
 
