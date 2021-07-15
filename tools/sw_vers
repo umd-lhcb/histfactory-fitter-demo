@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# We fake a macOS version so that root-config won't put garbage in various
-# compiler flags
-echo "ProductVersion: 10.12.3"
