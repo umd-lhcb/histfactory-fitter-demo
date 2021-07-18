@@ -65,14 +65,18 @@
 
 using namespace std;
 
-TDatime *date = new TDatime();
+/////////////
+// Helpers //
+/////////////
+
+unique_ptr<TDatime> get_date() {
+  return make_unique<TDatime>();
+}
 
 void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   using namespace RooFit;
-  RooRandom::randomGenerator()->SetSeed(date->Get() % 100000);
-  cout << date->Get() % 100000
-       << endl;  // For ToyMC, so I can run multiple copies
-  // with different seeds without recompiling
+  using namespace RooStats;
+  using namespace HistFactory;
 
   RooMsgService::instance().setGlobalKillBelow(
       RooFit::ERROR);  // avoid accidental unblinding!
@@ -104,10 +108,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
   TStopwatch sw, sw2, sw3;
 
-  TRandom *r3 = new TRandom3(date->Get());
-
-  using namespace RooStats;
-  using namespace HistFactory;
 
   // Many many flags for steering
   /* STEERING OPTIONS */
@@ -646,7 +646,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
   auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
 
-  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300, t.get());
+  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.root");
   c1->SaveAs(outputDir + "/" + "c1.pdf");
 
@@ -748,27 +748,12 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     char   thename[32];
     for (int k = 0; k < q2_bins * 2; k++) {
       c2->cd(k + 1);
-      /*
-        q2frames[k]->SetTitle(rangelabels[(k % q2_bins)]);
-        q2frames[k]->Draw();*/
       sprintf(thename, "bottompad_%d", k);
-      // c2->cd((k<q2_bins)*(2*k+1)+(k>=q2_bins)*(2*(k+1-q2_bins)));
-      TPad *padbottom = new TPad(thename, thename, 0., 0., 1., 0.3);
 
-      padbottom->SetFillColor(0);
-      padbottom->SetGridy();
-      padbottom->SetTickx();
-      padbottom->SetTicky();
-      padbottom->SetFillStyle(0);
-      padbottom->Draw();
-      padbottom->cd();
-      padbottom->SetLeftMargin(padbottom->GetLeftMargin() + 0.08);
-      padbottom->SetTopMargin(0);  // 0.01);
-      padbottom->SetRightMargin(0.04);
-      // padbottom->SetBottomMargin(padbottom->GetBottomMargin()+0.23);
-      padbottom->SetBottomMargin(0.5);
+      auto pad_bot = set_binned_fit_var_pad(thename);
+      pad_bot->Draw();
+      pad_bot->cd();
 
-      // c2b->cd(k+1);
       TH1 *    temphist2lo, *temphist2, *tempdathist;
       RooHist *temphist;
       if (k < q2_bins) {
@@ -778,23 +763,27 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       }
       temphist->SetFillColor(kBlue);
       temphist->SetLineColor(kWhite);
-      q2bframes[k]->SetTitle(q2frames[k]->GetTitle());
+
       q2bframes[k]->addPlotable(temphist, "B");
-      q2bframes[k]->GetXaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
-      q2bframes[k]->GetXaxis()->SetTitleSize(0.36 * 0.22 / 0.3);
-      // q2bframes[k]->GetXaxis()->SetTitle("");
-      q2bframes[k]->GetXaxis()->SetTickLength(0.10);
-      q2bframes[k]->GetYaxis()->SetTickLength(0.05);
-      q2bframes[k]->SetTitle("");
-      q2bframes[k]->GetYaxis()->SetTitleSize(0.33 * 0.22 / 0.3);
-      q2bframes[k]->GetYaxis()->SetTitle("Pulls");
-      q2bframes[k]->GetYaxis()->SetTitleOffset(0.2);
-      q2bframes[k]->GetXaxis()->SetTitleOffset(0.78);
-      q2bframes[k]->GetYaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
-      q2bframes[k]->GetYaxis()->SetLabelOffset(99);
-      q2bframes[k]->GetYaxis()->SetNdivisions(205);
+
+      set_binned_fit_var_pull_frame_style(q2bframes[k], "");
+
+      //q2bframes[k]->SetTitle(q2frames[k]->GetTitle());
+      //q2bframes[k]->GetXaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
+      //q2bframes[k]->GetXaxis()->SetTitleSize(0.36 * 0.22 / 0.3);
+      //q2bframes[k]->GetXaxis()->SetTickLength(0.10);
+      //q2bframes[k]->GetYaxis()->SetTickLength(0.05);
+      //q2bframes[k]->SetTitle("");
+      //q2bframes[k]->GetYaxis()->SetTitleSize(0.33 * 0.22 / 0.3);
+      //q2bframes[k]->GetYaxis()->SetTitle("Pulls");
+      //q2bframes[k]->GetYaxis()->SetTitleOffset(0.2);
+      //q2bframes[k]->GetXaxis()->SetTitleOffset(0.78);
+      //q2bframes[k]->GetYaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
+      //q2bframes[k]->GetYaxis()->SetLabelOffset(99);
+      //q2bframes[k]->GetYaxis()->SetNdivisions(205);
+      //q2bframes[k]->Draw();
       q2bframes[k]->Draw();
-      q2bframes[k]->Draw();
+
       double xloc = -2.25;
       if (k >= q2_bins) xloc = 50;
       t->SetTextSize(0.33 * 0.22 / 0.3);
@@ -803,19 +792,13 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       t->DrawLatex(xloc * 0.99, 2, " 2");
 
       c2->cd(k + 1);
-      // c2->cd((k<q2_bins)*(2*k+1)+(k>=q2_bins)*(2*(k+1-q2_bins)));
       sprintf(thename, "toppad_%d", k);
-      TPad *padtop = new TPad(thename, thename, 0., 0.3, 1., 1.);
-      padtop->SetLeftMargin(padtop->GetLeftMargin() + 0.08);
-      padtop->SetBottomMargin(0);  // padtop->GetBottomMargin()+0.08);
-      padtop->SetTopMargin(0.02);  // padtop->GetBottomMargin()+0.08);
-      padtop->SetRightMargin(0.04);
-      padtop->SetFillColor(0);
-      padtop->SetFillStyle(0);
-      padtop->SetTickx();
-      padtop->SetTicky();
+
+      auto padtop = set_binned_fit_var_pad(thename, 0., 0.3, 1., 1., 0.02, 0,
+          false);
       padtop->Draw();
       padtop->cd();
+
       q2frames[k]->SetMinimum(1e-4);
       if (k < q2_bins)
         q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale);
@@ -827,12 +810,9 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       q2frames[k]->GetXaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
       q2frames[k]->GetXaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
       q2frames[k]->GetYaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
+
       TString thetitle = q2frames[k]->GetYaxis()->GetTitle();
-      /*thetitle.Replace(10,1,"");
-        if(k < q2_bins)thetitle.Replace(27,1,"");
-        if(k >= q2_bins)thetitle.Replace(16,1,"");
-        thitle.Replace(0,6,"Candidates");*/
-      // q2frames[k]->GetYaxis()->SetTitle("");
+
       q2frames[k]->GetYaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
       q2frames[k]->GetXaxis()->SetTitleOffset(0.95);
       q2frames[k]->GetYaxis()->SetTitleOffset(0.95);
@@ -841,6 +821,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       t->SetTextSize(0.07);
       t->SetTextAlign(33);
       t->SetTextAngle(90);
+
       c2->cd((k < q2_bins) * (2 * k + 1) +
              (k >= q2_bins) * (2 * (k + 1 - q2_bins)));
       if (k >= q2_bins) {
