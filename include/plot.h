@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 18, 2021 at 03:46 PM +0200
+// Last Change: Mon Jan 03, 2022 at 12:00 AM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -14,13 +14,15 @@
 #include <TString.h>
 #include <TVirtualPad.h>
 
+#include <RooGlobalFunc.h>
 #include <RooPlot.h>
+#include <RooRealVar.h>
 
 /////////////
 // Helpers //
 /////////////
 
-void set_global_plot_style() {
+void setGlobalPlotStyle() {
   gROOT->ProcessLine("gStyle->SetLabelFont(132, \"xyz\");");
   gROOT->ProcessLine("gStyle->SetTitleFont(132, \"xyz\");");
   gROOT->ProcessLine("gStyle->SetTitleFont(132, \"t\");");
@@ -28,7 +30,7 @@ void set_global_plot_style() {
   gROOT->ProcessLine("gStyle->SetTitleY(0.970);");
 }
 
-std::unique_ptr<TLatex> make_label() {
+std::unique_ptr<TLatex> makeLabel() {
   auto lbl = std::make_unique<TLatex>();
   lbl->SetTextAlign(22);
   lbl->SetTextSize(0.06);
@@ -41,7 +43,7 @@ std::unique_ptr<TLatex> make_label() {
 // Plot fit variables //
 ////////////////////////
 
-void set_fit_vars_frame_style(TCanvas* cvs, RooPlot* frame, int idx) {
+void setFitVarsFrameStyle(TCanvas* cvs, RooPlot* frame, int idx) {
   auto pad = cvs->cd(idx);
 
   pad->SetTickx();
@@ -67,19 +69,18 @@ void set_fit_vars_frame_style(TCanvas* cvs, RooPlot* frame, int idx) {
   frame->GetYaxis()->SetTitle(title);
 }
 
-std::unique_ptr<TCanvas> plot_fit_vars(std::vector<RooPlot*>& frames,
-                                       std::vector<double>&   anchors,
-                                       char const* name, int width,
-                                       int height) {
+std::unique_ptr<TCanvas> plotFitVars(std::vector<RooPlot*>& frames,
+                                     std::vector<double>&   anchors,
+                                     char const* name, int width, int height) {
   auto cvs = std::make_unique<TCanvas>(name, name, width, height);
   cvs->SetTickx();
   cvs->SetTicky();
   cvs->Divide(frames.size(), 1);
 
-  auto lbl = make_label();
+  auto lbl = makeLabel();
 
   for (auto idx = 0; idx < frames.size(); idx++) {
-    set_fit_vars_frame_style(cvs.get(), frames[idx], idx + 1);
+    setFitVarsFrameStyle(cvs.get(), frames[idx], idx + 1);
     frames[idx]->Draw();
     lbl->DrawLatex(anchors[idx], frames[idx]->GetMaximum() * 0.95, "Demo");
   }
@@ -91,10 +92,10 @@ std::unique_ptr<TCanvas> plot_fit_vars(std::vector<RooPlot*>& frames,
 // Plot binned fit variables with pulls //
 //////////////////////////////////////////
 
-TPad* set_binned_fit_var_pad(char const* plot_name, double xlow = 0.,
-                             double ylow = 0., double xup = 1.,
-                             double yup = 0.3, float t_margin = 0.,
-                             float b_margin = 0.5, bool gridy = true) {
+TPad* setBinnedFitVarPad(char const* plot_name, double xlow = 0.,
+                         double ylow = 0., double xup = 1., double yup = 0.3,
+                         float tMargin = 0., float bMargin = 0.5,
+                         bool gridy = true) {
   auto pad = new TPad(plot_name, plot_name, xlow, ylow, xup, yup);
 
   pad->SetFillColor(0);
@@ -104,14 +105,14 @@ TPad* set_binned_fit_var_pad(char const* plot_name, double xlow = 0.,
   if (gridy) pad->SetGridy();
 
   pad->SetLeftMargin(pad->GetLeftMargin() + 0.08);
-  pad->SetTopMargin(t_margin);
+  pad->SetTopMargin(tMargin);
   pad->SetRightMargin(0.04);
-  pad->SetBottomMargin(b_margin);
+  pad->SetBottomMargin(bMargin);
 
   return pad;
 }
 
-void set_binned_fit_var_pull_frame_style(RooPlot* frame) {
+void setBinnedFitVarPullFrameStyle(RooPlot* frame) {
   frame->SetTitle("");
 
   frame->GetXaxis()->SetTitleSize(0.36 * 0.22 / 0.3);
@@ -128,7 +129,7 @@ void set_binned_fit_var_pull_frame_style(RooPlot* frame) {
   frame->GetYaxis()->SetNdivisions(205);
 }
 
-void set_binned_fit_var_main_frame_style(RooPlot* frame, char const* lbl) {
+void setBinnedFitVarMainFrameStyle(RooPlot* frame, char const* lbl) {
   frame->SetTitle(lbl);
   frame->SetTitleFont(132, "t");
 
@@ -142,32 +143,47 @@ void set_binned_fit_var_main_frame_style(RooPlot* frame, char const* lbl) {
   frame->GetYaxis()->SetNdivisions(506);
 }
 
-std::unique_ptr<TCanvas> plot_binned_fit_vars_w_pulls(
+std::unique_ptr<TCanvas> plotBinnedFitVarsWithPulls(
     std::vector<RooPlot*>& frames, std::vector<RooPlot*>& pulls,
     std::vector<char const*>& cuts, std::vector<char const*>& lbls,
     char const* name, int width, int height,
     std::vector<double> max_scale = {1.05, 1.05}) {
   auto cvs  = std::make_unique<TCanvas>(name, name, width, height);
-  auto lbl  = make_label();
+  auto lbl  = makeLabel();
   auto bins = cuts.size();
-  char plot_name[32];
+  char plotName[32];
 
   cvs->Divide(bins, 2);
 
   for (auto idx = 0; idx < frames.size(); idx++) {
     // Bottom pulls
     cvs->cd(idx + 1);
-    sprintf(plot_name, "bottompad_%d", idx);
+    sprintf(plotName, "bottompad_%d", idx);
 
-    auto pad_bot = set_binned_fit_var_pad(plot_name);
+    auto pad_bot = setBinnedFitVarPad(plotName);
     pad_bot->Draw();
     pad_bot->cd();
 
     // Prepare for bottom pull histogram
-    auto hist_pull = pulls[idx];
+    auto histPull = pulls[idx];
   }
 
   return cvs;
+}
+
+/////////////
+// Plot C1 //
+/////////////
+
+void plotC1(std::vector<RooRealVar*> vars, std::vector<TString> titles) {
+  using namespace RooFit;
+
+  std::vector<RooPlot*> frames{};
+  std::vector<RooHist*> resids{};
+
+  for (int idx = 0; idx < vars.size(); idx++) {
+    frames.push_back(vars[idx]->frame(Title(titles[idx])));
+  }
 }
 
 #endif

@@ -535,22 +535,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     if (useMinos) minuit_hf->minos(RooArgSet(*poi));
     sw.Stop();
     result = minuit_hf->save("Result", "Result");
-
-    // EXAMPLE LL SCAN
-    /*
-      RooAbsReal *pll=nll_hf->createProfile(*poi);
-      RooPlot *testFrame = poi->frame(Bins(10),Title("LL"),Range(0.02,0.06));
-      // alternately RooPlot *testFrame = poi->frame(Bins(20),Title("LL"),
-      Range(range_low,range_hi)); for restricted range
-      pll->plotOn(testFrame,ShiftToZero());
-      RooFormulaVar
-      derp("derp","0.5+(@0-(0.03778+0.004301))*(@0-(0.03778-0.004219))*0.5/(0.004219*0.004301)",RooArgList(*poi));
-      derp.plotOn(testFrame,ShiftToZero(),LineColor(kRed),LineStyle(kDashed));
-      TCanvas *cLL=new TCanvas("cLL","cLL");
-      testFrame->Draw();
-
-      gROOT->ProcessLine(".q");
-    */
   }
 
   if (result != NULL) {
@@ -590,10 +574,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     if (dofit)
       printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
              sw.RealTime(), sw3.RealTime());
-    // theIW->_cacheMgr.Print("V");
-    // w->Print();
-    // return;
-    // gROOT->ProcessLine(".q");
   }
   if (toyMC) {
     printf("Stopwatch: Generated test data in %f seconds\n", sw2.RealTime());
@@ -603,8 +583,8 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // Plots //
   ///////////
 
-  set_global_plot_style();
-  auto t = make_label();
+  setGlobalPlotStyle();
+  auto t = makeLabel();
 
   // Plot fit variables
   RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
@@ -615,13 +595,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
 
   RooHist *resids[nframes];
-  RooHist *mm2resid;  // = mm2_frame->pullHist() ;
-  RooHist *Elresid;   // = El_frame->pullHist() ;
-  RooHist *q2resid;   // = q2_frame->pullHist() ;
-
-  mm2resid = resids[0];
-  Elresid  = resids[1];
-  q2resid  = resids[2];
 
   for (int i = 0; i < nframes; i++) {
     data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
@@ -646,7 +619,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
   auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
 
-  auto c1 = plot_fit_vars(fit_var_frames, fit_var_anchors, "c1", 1000, 300);
+  auto c1 = plotFitVars(fit_var_frames, fit_var_anchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.root");
   c1->SaveAs(outputDir + "/" + "c1.pdf");
 
@@ -750,7 +723,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       c2->cd(k + 1);
       sprintf(thename, "bottompad_%d", k);
 
-      auto pad_bot = set_binned_fit_var_pad(thename);
+      auto pad_bot = setBinnedFitVarPad(thename);
       pad_bot->Draw();
       pad_bot->cd();
 
@@ -766,7 +739,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
       q2bframes[k]->addPlotable(temphist, "B");
 
-      set_binned_fit_var_pull_frame_style(q2bframes[k]);
+      setBinnedFitVarPullFrameStyle(q2bframes[k]);
       q2bframes[k]->Draw();
 
       double xloc = -2.25;
@@ -778,7 +751,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       c2->cd(k + 1);
       sprintf(thename, "toppad_%d", k);
 
-      auto padtop = set_binned_fit_var_pad(thename, 0., 0.3, 1., 1., 0.02, 0,
+      auto padtop = setBinnedFitVarPad(thename, 0., 0.3, 1., 1., 0.02, 0,
           false);
       padtop->Draw();
       padtop->cd();
@@ -789,7 +762,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
       if (k >= q2_bins)
         q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale2);
 
-      set_binned_fit_var_main_frame_style(q2frames[k], rangelabels[(k % q2_bins)]);
+      setBinnedFitVarMainFrameStyle(q2frames[k], rangelabels[(k % q2_bins)]);
       q2frames[k]->Draw();
 
       t->SetTextSize(0.07);
