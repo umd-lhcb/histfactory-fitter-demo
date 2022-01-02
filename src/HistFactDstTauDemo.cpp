@@ -766,29 +766,13 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
       q2bframes[k]->addPlotable(temphist, "B");
 
-      set_binned_fit_var_pull_frame_style(q2bframes[k], "");
-
-      //q2bframes[k]->SetTitle(q2frames[k]->GetTitle());
-      //q2bframes[k]->GetXaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
-      //q2bframes[k]->GetXaxis()->SetTitleSize(0.36 * 0.22 / 0.3);
-      //q2bframes[k]->GetXaxis()->SetTickLength(0.10);
-      //q2bframes[k]->GetYaxis()->SetTickLength(0.05);
-      //q2bframes[k]->SetTitle("");
-      //q2bframes[k]->GetYaxis()->SetTitleSize(0.33 * 0.22 / 0.3);
-      //q2bframes[k]->GetYaxis()->SetTitle("Pulls");
-      //q2bframes[k]->GetYaxis()->SetTitleOffset(0.2);
-      //q2bframes[k]->GetXaxis()->SetTitleOffset(0.78);
-      //q2bframes[k]->GetYaxis()->SetLabelSize(0.33 * 0.22 / 0.3);
-      //q2bframes[k]->GetYaxis()->SetLabelOffset(99);
-      //q2bframes[k]->GetYaxis()->SetNdivisions(205);
-      //q2bframes[k]->Draw();
+      set_binned_fit_var_pull_frame_style(q2bframes[k]);
       q2bframes[k]->Draw();
 
       double xloc = -2.25;
       if (k >= q2_bins) xloc = 50;
       t->SetTextSize(0.33 * 0.22 / 0.3);
       t->DrawLatex(xloc, -2, "-2");
-      // t->DrawLatex(xloc,0," 0");
       t->DrawLatex(xloc * 0.99, 2, " 2");
 
       c2->cd(k + 1);
@@ -804,24 +788,15 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
         q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale);
       if (k >= q2_bins)
         q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale2);
-      // q2frames[k]->SetMaximum(1.05*q2frames[k]->GetMaximum());
-      q2frames[k]->SetTitle(rangelabels[(k % q2_bins)]);
-      q2frames[k]->SetTitleFont(132, "t");
-      q2frames[k]->GetXaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
-      q2frames[k]->GetXaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
-      q2frames[k]->GetYaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
 
-      TString thetitle = q2frames[k]->GetYaxis()->GetTitle();
-
-      q2frames[k]->GetYaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
-      q2frames[k]->GetXaxis()->SetTitleOffset(0.95);
-      q2frames[k]->GetYaxis()->SetTitleOffset(0.95);
-      q2frames[k]->GetYaxis()->SetNdivisions(506);
+      set_binned_fit_var_main_frame_style(q2frames[k], rangelabels[(k % q2_bins)]);
       q2frames[k]->Draw();
+
       t->SetTextSize(0.07);
       t->SetTextAlign(33);
       t->SetTextAngle(90);
 
+      TString thetitle = q2frames[k]->GetYaxis()->GetTitle();
       c2->cd((k < q2_bins) * (2 * k + 1) +
              (k >= q2_bins) * (2 * (k + 1 - q2_bins)));
       if (k >= q2_bins) {

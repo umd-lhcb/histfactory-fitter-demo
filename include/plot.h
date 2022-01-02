@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 18, 2021 at 02:33 AM +0200
+// Last Change: Sun Jul 18, 2021 at 03:46 PM +0200
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -111,8 +111,8 @@ TPad* set_binned_fit_var_pad(char const* plot_name, double xlow = 0.,
   return pad;
 }
 
-void set_binned_fit_var_pull_frame_style(RooPlot* frame, char const* title) {
-  frame->SetTitle(title);
+void set_binned_fit_var_pull_frame_style(RooPlot* frame) {
+  frame->SetTitle("");
 
   frame->GetXaxis()->SetTitleSize(0.36 * 0.22 / 0.3);
   frame->GetXaxis()->SetTitleOffset(0.78);
@@ -128,11 +128,27 @@ void set_binned_fit_var_pull_frame_style(RooPlot* frame, char const* title) {
   frame->GetYaxis()->SetNdivisions(205);
 }
 
+void set_binned_fit_var_main_frame_style(RooPlot* frame, char const* lbl) {
+  frame->SetTitle(lbl);
+  frame->SetTitleFont(132, "t");
+
+  frame->GetXaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
+  frame->GetXaxis()->SetTitleOffset(0.95);
+  frame->GetXaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
+
+  frame->GetYaxis()->SetTitleSize(0.09 * 0.78 / 0.7);
+  frame->GetYaxis()->SetTitleOffset(0.95);
+  frame->GetYaxis()->SetLabelSize(0.09 * 0.78 / 0.7);
+  frame->GetYaxis()->SetNdivisions(506);
+}
+
 std::unique_ptr<TCanvas> plot_binned_fit_vars_w_pulls(
     std::vector<RooPlot*>& frames, std::vector<RooPlot*>& pulls,
-    std::vector<char const*>& cuts, char const* name, int width, int height,
+    std::vector<char const*>& cuts, std::vector<char const*>& lbls,
+    char const* name, int width, int height,
     std::vector<double> max_scale = {1.05, 1.05}) {
   auto cvs  = std::make_unique<TCanvas>(name, name, width, height);
+  auto lbl  = make_label();
   auto bins = cuts.size();
   char plot_name[32];
 
@@ -147,9 +163,8 @@ std::unique_ptr<TCanvas> plot_binned_fit_vars_w_pulls(
     pad_bot->Draw();
     pad_bot->cd();
 
+    // Prepare for bottom pull histogram
     auto hist_pull = pulls[idx];
-
-    // Prepare for bottom pull plot
   }
 
   return cvs;
