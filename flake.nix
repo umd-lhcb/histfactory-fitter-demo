@@ -20,7 +20,6 @@
           name = "histfactory-fitter-demo";
           buildInputs = with pkgs; [
             # Utilities
-            sw_vers
             clang-tools
             clang-format-all
 
