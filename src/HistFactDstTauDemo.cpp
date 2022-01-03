@@ -95,15 +95,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     cout << "mcN_" + mchistos[i] + " = " << 1. / *(mcnorms[i]) << endl;
   }
 
-  // Useful later to have the bin max and min for drawing
-  TH3 *JUNK;
-  q.GetObject("h_sigmu", JUNK);
-  double    q2_low  = JUNK->GetZaxis()->GetXmin();
-  double    q2_high = JUNK->GetZaxis()->GetXmax();
-  const int q2_bins = JUNK->GetZaxis()->GetNbins();
-  JUNK->SetDirectory(0);
-  q.Close();
-
   TStopwatch sw, sw2, sw3;
 
   // Many many flags for steering
@@ -125,6 +116,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   //(3+1)d fit configuration
   const int numtoys = 1;
   const int toysize = 384236;
+
   // Set the prefix that will appear before
   // all output for this measurement
   RooStats::HistFactory::Measurement meas("my_measurement", "my measurement");
@@ -237,18 +229,10 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   sw3.Reset();
   sw3.Start();
   meas.AddChannel(chan);
-  RooStats::HistFactory::Channel chan2(chan);
-  chan2.SetName("FakeD");
-  // meas.AddChannel(chan2);
 
   meas.CollectHistograms();
-  /*meas.AddConstantParam("mcNorm_sigmu");
-    meas.AddConstantParam("mcNorm_sigtau");
-    meas.AddConstantParam("mcNorm_D1");
-    meas.AddConstantParam("fD1");
-    meas.AddConstantParam("NDstst0");
-    meas.AddConstantParam("NmisID");
-  */
+
+  ////
 
   RooWorkspace *w;
   w = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
@@ -349,7 +333,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // This switches the model to a class written to handle analytic
   // Barlow-Beeston lite. Otherwise, every bin gets a minuit variable to
   // minimize over! This class, on the other hand, allows a likelihood where the
-  // bin parameters are analyitically minimized at each step
+  // bin parameters are analytically minimized at each step
   HistFactorySimultaneous *model_hf = new HistFactorySimultaneous(*model);
 
   RooFitResult *toyresult;
@@ -375,129 +359,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   RooDataSet *toyminos =
       new RooDataSet("toyminos", "toyminos", *theVars, StoreError(*theVars));
   // The following code is very messy. Sorry.
-  if (toyMC) {
-    double checkvar;
-    double checkvarmean = 0;
-
-    if (fitfirst) {
-      nll_hf                 = model_hf->createNLL(*data);
-      RooMinuit *minuit_temp = new RooMinuit(*nll_hf);
-      minuit_temp->setPrintLevel(-1);
-      minuit_temp->optimizeConst(1);
-      minuit_temp->setErrorLevel(0.5);  // 1-sigma = DLL of 0.5
-      minuit_temp->setOffsetting(kTRUE);
-      minuit_temp->fit("smh");
-      poi->setVal(expTau * 0.85);
-      checkvar = ((RooRealVar *)allpars->find("Nmu"))->getVal();
-      cout << checkvar << endl;
-    } else {
-      // lets set some params
-      if (useMuShapeUncerts) {
-        ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v1mu")))
-            ->setVal(1.06);
-        ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v2mu")))
-            ->setVal(-0.159);
-        ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v3mu")))
-            ->setVal(-1.75);
-      }
-      if (useTauShapeUncerts) {
-        ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v4tau")))
-            ->setVal(0.0002);
-      }
-      if (useDststShapeUncerts) {
-        ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_IW")))
-            ->setVal(0.2);  //-2.187);
-      }
-    }
-
-    w->saveSnapshot("GENPARS", *allpars, kTRUE);
-
-    RooDataSet *datanom;
-    cerr << "Attempting to generate toyMC..." << endl;
-    sw2.Reset();
-    sw2.Start();
-    double running_mean = 0;
-    double running_RMS  = 0;
-    for (int runnum = 0; runnum < numtoys; runnum++) {
-      w->loadSnapshot("GENPARS");
-      cerr << "DEBUG CHECK: Ntau=" << poi->getVal() << endl;
-      cout << "PROGRESS: SAMPLE NUMBER " << runnum << " STARTING GENERATION... "
-           << endl;
-      RooDataSet *data2 = model->generate(
-          RooArgSet(*x, *y, *z, model->indexCat()), Name("test"), AllBinned(),
-          NumEvents(toysize), Extended());
-      double wsum = 0.;
-      data2->Print();
-      cout << "DONE" << endl;
-      w->loadSnapshot("TMCPARS");
-      nll_hf                = model_hf->createNLL(*data2);
-      RooMinuit *minuit_toy = new RooMinuit(*nll_hf);
-      minuit_toy->optimizeConst(1);
-      // minuit_toy->setPrintLevel(-1);
-      minuit_toy->setOffsetting(kFALSE);
-      minuit_toy->setOffsetting(kTRUE);
-      minuit_toy->setErrorLevel(0.5);
-      minuit_toy->setStrategy(2);
-      // minuit_toy->setEps(5e-16);
-      cout << "PROGRESS: FITTING SAMPLE " << runnum << " NOW...\t";
-      minuit_toy->fit("smh");
-      cout << " DONE. SAVING RESULT.\n" << endl;
-      checkvarmean += ((RooRealVar *)allpars->find("Nmu"))->getVal();
-      cout << "DEBUG CHECK: <Nmu>-Nmu_input = "
-           << checkvarmean / (runnum + 1) - checkvar << endl;
-      poierror.setVal(poi->getError());
-      toyresults->add(*theVars);
-      cout << "PROGRESS: ATTEMPTING MINOS FOR SAMPLE " << runnum << " NOW...\t";
-      minuit_toy->minos(RooArgSet(*poi));
-      RooFitResult *testresult = minuit_toy->save("TOY", "TOY");
-      result                   = testresult;
-      double edm               = testresult->edm();
-      if (edm > 0.1) {
-        cout << "BAD FIT. SKIPPING..." << endl;
-        continue;
-      }
-      cout << " DONE. SAVING RESULT.\n" << endl;
-      toyminos->add(*theVars);
-      delete minuit_toy;
-      delete nll_hf;
-      if (runnum + 1 < numtoys) {
-        delete data2;
-        delete testresult;
-      }
-      data         = data2;
-      double pulli = (poi->getVal() - expTau * 0.85) / poi->getError();
-      running_mean += pulli;
-      running_RMS += pulli * pulli;
-      cout << "RUNNING MEAN IS " << running_mean / (runnum + 1)
-           << "\tRUNNING RMS IS " << sqrt(running_RMS / (runnum + 1)) << endl;
-    }
-    sw2.Stop();
-    RooFormulaVar poi_pull("poi_pull", "title", "(@0-0.03428)/@1",
-                           RooArgList(*poi, poierror));
-    RooRealVar *  pulls = (RooRealVar *)toyminos->addColumn(poi_pull);
-    pulls->setRange(-5, 5);
-    pulls->setBins(50);
-    RooRealVar  fitmu("fitmu", "#mu", 0., -5, 5);
-    RooRealVar  fitsig("fitsig", "#sigma", 1., 0.1, 10);
-    RooGaussian gaus("gaus", "gaus", *pulls, fitmu, fitsig);
-    gaus.fitTo(*toyminos, Range(-5, 5));
-    TCanvas *toytest = new TCanvas("toytest", "toytest");
-    toytest->Divide(2, 1);
-    toytest->cd(1);
-    RooPlot *testframe = pulls->frame(Title("POI Pull"));
-    toyminos->plotOn(testframe);
-    gaus.plotOn(testframe);
-    gaus.paramOn(testframe);
-    testframe->Draw();
-    // toytest->cd(2);
-    // RooPlot *errframe = poierror.frame(Title("POI Error"));
-    // toyresults->plotOn(errframe, Cut("poi_pull > -5 && poi_pull < 5"));
-    // errframe->Draw();
-    toytest->cd(2);
-    RooPlot *valframe = poi->frame(Title("POI"));
-    toyresults->plotOn(valframe);
-    valframe->Draw();
-  }
 
   if (dofit) {  // return;
     nll_hf = model_hf->createNLL(*data, Offset(kTRUE));
@@ -515,11 +376,9 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 #endif
 
     std::cout << "Minimizing the Minuit (Migrad)" << std::endl;
-    if (toyMC) {
-      w->loadSnapshot("TMCPARS");
-    } else {
-      w->saveSnapshot("TMCPARS", *allpars, kTRUE);
-    }
+
+    w->saveSnapshot("TMCPARS", *allpars, kTRUE);
+
     sw3.Stop();
     sw.Reset();
     sw.Start();
@@ -620,13 +479,6 @@ int main(int argc, char **argv) {
     ("bbOn3D", "enable Barlow-Beeston procedure for all histograms")
     ////
     ("doFit", "perform a fit")
-    ////
-    ("doToyMC", "perform a toy MC study")
-    ("fitFirst", "fit before generate toy MC")
-    ("numToys", "number of toy MC sample to generate", cxxopts::value<int>()
-     ->default_value("1"))
-    ("toySize", "size of the generated toy MC", cxxopts::value<int>()
-     ->default_value("384236"))
     ////
     ("expTau", "?", cxxopts::value<double>()
      ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
