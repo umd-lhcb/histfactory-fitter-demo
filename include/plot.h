@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jan 03, 2022 at 12:00 AM +0100
+// Last Change: Mon Jan 03, 2022 at 03:13 AM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -17,6 +17,9 @@
 #include <RooGlobalFunc.h>
 #include <RooPlot.h>
 #include <RooRealVar.h>
+#include <RooStats/HistFactory/HistFactorySimultaneous.h>
+
+using RooStats::HistFactory::HistFactorySimultaneous;
 
 /////////////
 // Helpers //
@@ -146,8 +149,7 @@ void setBinnedFitVarMainFrameStyle(RooPlot* frame, char const* lbl) {
 std::unique_ptr<TCanvas> plotBinnedFitVarsWithPulls(
     std::vector<RooPlot*>& frames, std::vector<RooPlot*>& pulls,
     std::vector<char const*>& cuts, std::vector<char const*>& lbls,
-    char const* name, int width, int height,
-    std::vector<double> max_scale = {1.05, 1.05}) {
+    char const* name, int width, int height) {
   auto cvs  = std::make_unique<TCanvas>(name, name, width, height);
   auto lbl  = makeLabel();
   auto bins = cuts.size();
@@ -160,9 +162,9 @@ std::unique_ptr<TCanvas> plotBinnedFitVarsWithPulls(
     cvs->cd(idx + 1);
     sprintf(plotName, "bottompad_%d", idx);
 
-    auto pad_bot = setBinnedFitVarPad(plotName);
-    pad_bot->Draw();
-    pad_bot->cd();
+    auto padBot = setBinnedFitVarPad(plotName);
+    padBot->Draw();
+    padBot->cd();
 
     // Prepare for bottom pull histogram
     auto histPull = pulls[idx];
@@ -175,7 +177,8 @@ std::unique_ptr<TCanvas> plotBinnedFitVarsWithPulls(
 // Plot C1 //
 /////////////
 
-void plotC1(std::vector<RooRealVar*> vars, std::vector<TString> titles) {
+void plotC1(std::vector<RooRealVar*> vars, std::vector<TString> titles,
+            RooAbsData* data, HistFactorySimultaneous* hf_model) {
   using namespace RooFit;
 
   std::vector<RooPlot*> frames{};
