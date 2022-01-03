@@ -580,7 +580,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   ///////////
 
   setGlobalPlotStyle();
-  // auto t = makeLabel();
 
   // Plot fit variables
   cout << "Plot fit variables..." << endl;
@@ -636,36 +635,36 @@ int main(int argc, char **argv) {
     ;
   // clang-format on
 
-  auto parsed_args = argparse.parse(argc, argv);
-  auto mode        = parsed_args["mode"].as<string>();
+  auto parsedArgs = argparse.parse(argc, argv);
+  auto mode        = parsedArgs["mode"].as<string>();
 
   // Define default values for modes
-  auto parsed_args_proxy = ArgProxy(parsed_args, mode);
+  auto parsedArgsProxy = ArgProxy(parsedArgs, mode);
   // clang-format off
-  parsed_args_proxy.set_default("fullFit", map<string, any>{
-      {"constrainDstst", true},
-      {"useMinos", true},
-      {"useMuShapeUncerts", true},
-      {"useTauShapeUncerts", true},
-      {"useDststShapeUncerts", true},
-      {"fixShapes", false},
-      {"fixShapesDstst", false},
-      {"bbOn3D", true},
-      {"doFit", true},
-      {"doToyMC", false},
-      {"fitFirst", false},
+  parsedArgsProxy.set_default("fullFit", map<string, any>{
+    {"constrainDstst", true},
+    {"useMinos", true},
+    {"useMuShapeUncerts", true},
+    {"useTauShapeUncerts", true},
+    {"useDststShapeUncerts", true},
+    {"fixShapes", false},
+    {"fixShapesDstst", false},
+    {"bbOn3D", true},
+    {"doFit", true},
+    {"doToyMC", false},
+    {"fitFirst", false},
   });
   // clang-format on
 
-  if (parsed_args.count("help")) {
+  if (parsedArgs.count("help")) {
     cout << argparse.help() << endl;
     exit(0);
   }
 
-  auto inputFile = TString(parsed_args["inputFile"].as<string>());
-  auto outputDir = TString(parsed_args["outputDir"].as<string>());
+  auto inputFile = TString(parsedArgs["inputFile"].as<string>());
+  auto outputDir = TString(parsedArgs["outputDir"].as<string>());
 
-  HistFactDstTauDemo(inputFile, outputDir, parsed_args_proxy);
+  HistFactDstTauDemo(inputFile, outputDir, parsedArgsProxy);
 
   return 0;
 }
