@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jan 03, 2022 at 11:18 PM +0100
+// Last Change: Tue Jan 04, 2022 at 12:09 AM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -107,9 +107,7 @@ std::vector<RooPlot*> plotC1(std::vector<RooRealVar*> vars,
 
   for (int idx = 0; idx < vars.size(); idx++) {
     frames.push_back(vars[idx]->frame(Title(titles[idx])));
-  }
 
-  for (int idx = 0; idx < frames.size(); idx++) {
     data->plotOn(frames[idx], DataError(RooAbsData::Poisson),
                  Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
 
