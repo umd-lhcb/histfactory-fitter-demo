@@ -584,220 +584,195 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   ///////////
 
   setGlobalPlotStyle();
-  auto t = makeLabel();
+  //auto t = makeLabel();
 
   // Plot fit variables
-  //RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
-  //RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
-  //RooPlot *q2_frame  = z->frame(Title("q^{2}"));
-
-  //const int nframes             = 3;
-  //RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
-
-  //RooHist *resids[nframes];
-
-  //for (int i = 0; i < nframes; i++) {
-    //data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
-                 //Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
-    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     //DrawOption("F"), FillColor(kRed));
-    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     //DrawOption("F"), FillColor(kViolet),
-                     //Components("*misID*,*sigmu*,*D1*"));
-    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     //DrawOption("F"), FillColor(kBlue + 1),
-                     //Components("*misID*,*sigmu*"));
-    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     //DrawOption("F"), FillColor(kOrange),
-                     //Components("*misID*"));
-    //resids[i] = drawframes[i]->pullHist();
-  //}
-
   cout << "Plot fit variables..." << endl;
-  auto fit_var_frames = plotC1(
+  auto fitVarFrames = plotC1(
       std::vector<RooRealVar*>{x, y, z}, {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, model_hf, idx);
-  //auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
-  auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
+  auto fitVarAnchors = vector<double>{8.7, 2250, 11.1e6};
 
-  auto c1 = plotFitVars(fit_var_frames, fit_var_anchors, "c1", 1000, 300);
+  auto c1 = plotFitVars(fitVarFrames, fitVarAnchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.root");
   c1->SaveAs(outputDir + "/" + "c1.pdf");
 
   // Slow plot related stuff
-  RooPlot *mm2q2_frame[q2_bins];
-  RooPlot *Elq2_frame[q2_bins];
-
-  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
-  RooPlot *El_resid_frame  = y->frame(Title("El"));
-  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
-
-  RooPlot * q2frames[2 * q2_bins];
-  RooPlot * q2bframes[2 * q2_bins];
-
-  for (int i = 0; i < q2_bins; i++) {
-    mm2q2_frame[i]         = x->frame();
-    Elq2_frame[i]          = y->frame();
-    q2frames[i]            = mm2q2_frame[i];
-    q2frames[i + q2_bins]  = Elq2_frame[i];
-    q2bframes[i]           = x->frame();
-    q2bframes[i + q2_bins] = y->frame();
-  }
-
-  const int ncomps = 10;
-
-  char     cutstrings[q2_bins][128];
-  char     rangenames[q2_bins][32];
-  char     rangelabels[q2_bins][128];
-  RooHist *mm2q2_pulls[q2_bins];
-  RooHist *Elq2_pulls[q2_bins];
-
-  for (int i = 0; i < q2_bins; i++) {
-    double binlow  = q2_low + i * (q2_high - q2_low) / q2_bins;
-    double binhigh = q2_low + (i + 1) * (q2_high - q2_low) / q2_bins;
-    sprintf(rangelabels[i], "%.2f < q^{2} < %.2f", binlow * 1e-6,
-            binhigh * 1e-6);
-    sprintf(cutstrings[i],
-            "obs_z_Dstmu_kinematic > %f && obs_z_Dstmu_kinematic < %f && "
-            "channelCat==0",
-            q2_low + i * (q2_high - q2_low) / q2_bins,
-            q2_low + (i + 1) * (q2_high - q2_low) / q2_bins);
-    sprintf(rangenames[i], "q2bin_%d", i);
-    z->setRange(rangenames[i], binlow, binhigh);
-  }
-
-  slowplots = false;
-  if (slowplots == true) {
-    cout << "Drawing Slow Plots" << endl;
-    for (int i = 0; i < q2_bins; i++) {
-      data->plotOn(mm2q2_frame[i], Cut(cutstrings[i]),
-                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
-                   DrawOption("ZP"));
-      data->plotOn(Elq2_frame[i], Cut(cutstrings[i]),
-                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
-                   DrawOption("ZP"));
-      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kRed));
-      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kRed));
-
-      // Grab pulls
-      mm2q2_pulls[i] = mm2q2_frame[i]->pullHist();
-      Elq2_pulls[i]  = Elq2_frame[i]->pullHist();
-
-      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kViolet), Components("*sigmu*,*D1*,*misID*"));
-      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kViolet), Components("*sigmu*,*D1*,*misID*"));
-      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kBlue + 1), Components("*sigmu*,*misID*"));
-      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kBlue + 1), Components("*sigmu*,*misID*"));
-      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kOrange), Components("*misID*"));
-      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
-                       ProjectionRange(rangenames[i]), DrawOption("F"),
-                       FillColor(kOrange), Components("*misID*"));
-      data->plotOn(mm2q2_frame[i], Cut(cutstrings[i]),
-                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
-                   DrawOption("ZP"));
-      data->plotOn(Elq2_frame[i], Cut(cutstrings[i]),
-                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
-                   DrawOption("ZP"));
-    }
-  }
-
-  TCanvas *c2;
-  if (slowplots == true) {
-    c2 = new TCanvas("c2", "c2", 1200, 600);
-    c2->Divide(q2_bins, 2);
-    double max_scale  = 1.05;
-    double max_scale2 = 1.05;
-    char   thename[32];
-    for (int k = 0; k < q2_bins * 2; k++) {
-      c2->cd(k + 1);
-      sprintf(thename, "bottompad_%d", k);
-
-      auto pad_bot = setBinnedFitVarPad(thename);
-      pad_bot->Draw();
-      pad_bot->cd();
-
-      TH1 *    temphist2lo, *temphist2, *tempdathist;
-      RooHist *temphist;
-      if (k < q2_bins) {
-        temphist = mm2q2_pulls[k];
-      } else {
-        temphist = Elq2_pulls[k - q2_bins];
-      }
-      temphist->SetFillColor(kBlue);
-      temphist->SetLineColor(kWhite);
-
-      q2bframes[k]->addPlotable(temphist, "B");
-
-      setBinnedFitVarPullFrameStyle(q2bframes[k]);
-      q2bframes[k]->Draw();
-
-      double xloc = -2.25;
-      if (k >= q2_bins) xloc = 50;
-      t->SetTextSize(0.33 * 0.22 / 0.3);
-      t->DrawLatex(xloc, -2, "-2");
-      t->DrawLatex(xloc * 0.99, 2, " 2");
-
-      c2->cd(k + 1);
-      sprintf(thename, "toppad_%d", k);
-
-      auto padtop = setBinnedFitVarPad(thename, 0., 0.3, 1., 1., 0.02, 0,
-          false);
-      padtop->Draw();
-      padtop->cd();
-
-      q2frames[k]->SetMinimum(1e-4);
-      if (k < q2_bins)
-        q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale);
-      if (k >= q2_bins)
-        q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale2);
-
-      setBinnedFitVarMainFrameStyle(q2frames[k], rangelabels[(k % q2_bins)]);
-      q2frames[k]->Draw();
-
-      t->SetTextSize(0.07);
-      t->SetTextAlign(33);
-      t->SetTextAngle(90);
-
-      TString thetitle = q2frames[k]->GetYaxis()->GetTitle();
-      c2->cd((k < q2_bins) * (2 * k + 1) +
-             (k >= q2_bins) * (2 * (k + 1 - q2_bins)));
-      if (k >= q2_bins) {
-        t->DrawLatex(0.01, 0.99, thetitle);
-      }
-      if (k < q2_bins) {
-        t->DrawLatex(0.01, 0.99, thetitle);
-      }
-      t->SetTextAlign(22);
-      t->SetTextAngle(0);
-      padtop->cd();
-      t->SetTextSize(0.09 * 0.78 / 0.7);
-      if (k >= q2_bins) {
-        t->DrawLatex(2250, q2frames[k]->GetMaximum() * 0.92, "Demo");
-      }
-      if (k < q2_bins) {
-        t->DrawLatex(8.7, q2frames[k]->GetMaximum() * 0.92, "Demo");
-      }
-    }
-  }
-  cerr << data->sumEntries() << '\t'
-       << model_hf->expectedEvents(RooArgSet(*x, *y, *z, *idx)) << endl;
-
-  if (c2 != NULL) {
-    c2->SaveAs(outputDir + "/" + "c2.root");
-    c2->SaveAs(outputDir + "/" + "c2.pdf");
-  }
+/*
+ *  RooPlot *mm2q2_frame[q2_bins];
+ *  RooPlot *Elq2_frame[q2_bins];
+ *
+ *  RooPlot *mm2_resid_frame = x->frame(Title("mm2"));
+ *  RooPlot *El_resid_frame  = y->frame(Title("El"));
+ *  RooPlot *q2_resid_frame  = z->frame(Title("q2"));
+ *
+ *  RooPlot * q2frames[2 * q2_bins];
+ *  RooPlot * q2bframes[2 * q2_bins];
+ *
+ *  for (int i = 0; i < q2_bins; i++) {
+ *    mm2q2_frame[i]         = x->frame();
+ *    Elq2_frame[i]          = y->frame();
+ *    q2frames[i]            = mm2q2_frame[i];
+ *    q2frames[i + q2_bins]  = Elq2_frame[i];
+ *    q2bframes[i]           = x->frame();
+ *    q2bframes[i + q2_bins] = y->frame();
+ *  }
+ *
+ *  const int ncomps = 10;
+ *
+ *  char     cutstrings[q2_bins][128];
+ *  char     rangenames[q2_bins][32];
+ *  char     rangelabels[q2_bins][128];
+ *  RooHist *mm2q2_pulls[q2_bins];
+ *  RooHist *Elq2_pulls[q2_bins];
+ *
+ *  for (int i = 0; i < q2_bins; i++) {
+ *    double binlow  = q2_low + i * (q2_high - q2_low) / q2_bins;
+ *    double binhigh = q2_low + (i + 1) * (q2_high - q2_low) / q2_bins;
+ *    sprintf(rangelabels[i], "%.2f < q^{2} < %.2f", binlow * 1e-6,
+ *            binhigh * 1e-6);
+ *    sprintf(cutstrings[i],
+ *            "obs_z_Dstmu_kinematic > %f && obs_z_Dstmu_kinematic < %f && "
+ *            "channelCat==0",
+ *            q2_low + i * (q2_high - q2_low) / q2_bins,
+ *            q2_low + (i + 1) * (q2_high - q2_low) / q2_bins);
+ *    sprintf(rangenames[i], "q2bin_%d", i);
+ *    z->setRange(rangenames[i], binlow, binhigh);
+ *  }
+ *
+ *  slowplots = false;
+ *  if (slowplots == true) {
+ *    cout << "Drawing Slow Plots" << endl;
+ *    for (int i = 0; i < q2_bins; i++) {
+ *      data->plotOn(mm2q2_frame[i], Cut(cutstrings[i]),
+ *                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
+ *                   DrawOption("ZP"));
+ *      data->plotOn(Elq2_frame[i], Cut(cutstrings[i]),
+ *                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
+ *                   DrawOption("ZP"));
+ *      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kRed));
+ *      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kRed));
+ *
+ *      // Grab pulls
+ *      mm2q2_pulls[i] = mm2q2_frame[i]->pullHist();
+ *      Elq2_pulls[i]  = Elq2_frame[i]->pullHist();
+ *
+ *      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kViolet), Components("*sigmu*,*D1*,*misID*"));
+ *      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kViolet), Components("*sigmu*,*D1*,*misID*"));
+ *      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kBlue + 1), Components("*sigmu*,*misID*"));
+ *      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kBlue + 1), Components("*sigmu*,*misID*"));
+ *      model_hf->plotOn(mm2q2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kOrange), Components("*misID*"));
+ *      model_hf->plotOn(Elq2_frame[i], Slice(*idx), ProjWData(*idx, *data),
+ *                       ProjectionRange(rangenames[i]), DrawOption("F"),
+ *                       FillColor(kOrange), Components("*misID*"));
+ *      data->plotOn(mm2q2_frame[i], Cut(cutstrings[i]),
+ *                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
+ *                   DrawOption("ZP"));
+ *      data->plotOn(Elq2_frame[i], Cut(cutstrings[i]),
+ *                   DataError(RooAbsData::Poisson), MarkerSize(0.4),
+ *                   DrawOption("ZP"));
+ *    }
+ *  }
+ *
+ *  TCanvas *c2;
+ *  if (slowplots == true) {
+ *    c2 = new TCanvas("c2", "c2", 1200, 600);
+ *    c2->Divide(q2_bins, 2);
+ *    double max_scale  = 1.05;
+ *    double max_scale2 = 1.05;
+ *    char   thename[32];
+ *    for (int k = 0; k < q2_bins * 2; k++) {
+ *      c2->cd(k + 1);
+ *      sprintf(thename, "bottompad_%d", k);
+ *
+ *      auto pad_bot = setBinnedFitVarPad(thename);
+ *      pad_bot->Draw();
+ *      pad_bot->cd();
+ *
+ *      TH1 *    temphist2lo, *temphist2, *tempdathist;
+ *      RooHist *temphist;
+ *      if (k < q2_bins) {
+ *        temphist = mm2q2_pulls[k];
+ *      } else {
+ *        temphist = Elq2_pulls[k - q2_bins];
+ *      }
+ *      temphist->SetFillColor(kBlue);
+ *      temphist->SetLineColor(kWhite);
+ *
+ *      q2bframes[k]->addPlotable(temphist, "B");
+ *
+ *      setBinnedFitVarPullFrameStyle(q2bframes[k]);
+ *      q2bframes[k]->Draw();
+ *
+ *      double xloc = -2.25;
+ *      if (k >= q2_bins) xloc = 50;
+ *      t->SetTextSize(0.33 * 0.22 / 0.3);
+ *      t->DrawLatex(xloc, -2, "-2");
+ *      t->DrawLatex(xloc * 0.99, 2, " 2");
+ *
+ *      c2->cd(k + 1);
+ *      sprintf(thename, "toppad_%d", k);
+ *
+ *      auto padtop = setBinnedFitVarPad(thename, 0., 0.3, 1., 1., 0.02, 0,
+ *          false);
+ *      padtop->Draw();
+ *      padtop->cd();
+ *
+ *      q2frames[k]->SetMinimum(1e-4);
+ *      if (k < q2_bins)
+ *        q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale);
+ *      if (k >= q2_bins)
+ *        q2frames[k]->SetMaximum(q2frames[k]->GetMaximum() * max_scale2);
+ *
+ *      setBinnedFitVarMainFrameStyle(q2frames[k], rangelabels[(k % q2_bins)]);
+ *      q2frames[k]->Draw();
+ *
+ *      t->SetTextSize(0.07);
+ *      t->SetTextAlign(33);
+ *      t->SetTextAngle(90);
+ *
+ *      TString thetitle = q2frames[k]->GetYaxis()->GetTitle();
+ *      c2->cd((k < q2_bins) * (2 * k + 1) +
+ *             (k >= q2_bins) * (2 * (k + 1 - q2_bins)));
+ *      if (k >= q2_bins) {
+ *        t->DrawLatex(0.01, 0.99, thetitle);
+ *      }
+ *      if (k < q2_bins) {
+ *        t->DrawLatex(0.01, 0.99, thetitle);
+ *      }
+ *      t->SetTextAlign(22);
+ *      t->SetTextAngle(0);
+ *      padtop->cd();
+ *      t->SetTextSize(0.09 * 0.78 / 0.7);
+ *      if (k >= q2_bins) {
+ *        t->DrawLatex(2250, q2frames[k]->GetMaximum() * 0.92, "Demo");
+ *      }
+ *      if (k < q2_bins) {
+ *        t->DrawLatex(8.7, q2frames[k]->GetMaximum() * 0.92, "Demo");
+ *      }
+ *    }
+ *  }
+ *  cerr << data->sumEntries() << '\t'
+ *       << model_hf->expectedEvents(RooArgSet(*x, *y, *z, *idx)) << endl;
+ *
+ *  if (c2 != NULL) {
+ *    c2->SaveAs(outputDir + "/" + "c2.root");
+ *    c2->SaveAs(outputDir + "/" + "c2.pdf");
+ *  }
+ */
 }
 
 //////////
