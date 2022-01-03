@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jan 03, 2022 at 03:13 AM +0100
+// Last Change: Mon Jan 03, 2022 at 03:30 AM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -14,6 +14,8 @@
 #include <TString.h>
 #include <TVirtualPad.h>
 
+#include <RooAbsData.h>
+#include <RooCategory.h>
 #include <RooGlobalFunc.h>
 #include <RooPlot.h>
 #include <RooRealVar.h>
@@ -177,8 +179,10 @@ std::unique_ptr<TCanvas> plotBinnedFitVarsWithPulls(
 // Plot C1 //
 /////////////
 
-void plotC1(std::vector<RooRealVar*> vars, std::vector<TString> titles,
-            RooAbsData* data, HistFactorySimultaneous* hf_model) {
+std::vector<RooPlot*> plotC1(std::vector<RooRealVar*> vars,
+                             std::vector<TString> titles, RooAbsData* data,
+                             HistFactorySimultaneous* model_hf,
+                             RooCategory*             ch_cat) {
   using namespace RooFit;
 
   std::vector<RooPlot*> frames{};
@@ -186,7 +190,26 @@ void plotC1(std::vector<RooRealVar*> vars, std::vector<TString> titles,
 
   for (int idx = 0; idx < vars.size(); idx++) {
     frames.push_back(vars[idx]->frame(Title(titles[idx])));
+
+    data->plotOn(frames[idx], DataError(RooAbsData::Poisson),
+                 Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
+
+    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
+                     DrawOption("F"), FillColor(kRed));
+    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
+                     DrawOption("F"), FillColor(kViolet),
+                     Components("*misID*,*sigmu*,*D1*"));
+    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
+                     DrawOption("F"), FillColor(kBlue + 1),
+                     Components("*misID*,*sigmu*"));
+    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
+                     DrawOption("F"), FillColor(kOrange),
+                     Components("*misID*"));
+
+    resids[idx] = frames[idx]->pullHist();
   }
+
+  return frames;
 }
 
 #endif

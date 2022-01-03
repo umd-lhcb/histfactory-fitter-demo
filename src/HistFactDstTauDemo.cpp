@@ -121,7 +121,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   const bool dofit                = true;
   const bool toyMC                = false;
   const bool fitfirst             = false;
-  const bool slowplots            = true;
+  bool slowplots            = true;
   const bool BBon3d =
       true;  // flag to enable Barlow-Beeston procedure for all histograms.
   // Should allow easy comparison of fit errors with and
@@ -587,36 +587,36 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   auto t = makeLabel();
 
   // Plot fit variables
-  RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
-  RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
-  RooPlot *q2_frame  = z->frame(Title("q^{2}"));
+  //RooPlot *mm2_frame = x->frame(Title("m^{2}_{miss}"));
+  //RooPlot *El_frame  = y->frame(Title("E_{#mu}"));
+  //RooPlot *q2_frame  = z->frame(Title("q^{2}"));
 
-  const int nframes             = 3;
-  RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
+  //const int nframes             = 3;
+  //RooPlot * drawframes[nframes] = {mm2_frame, El_frame, q2_frame};
 
-  RooHist *resids[nframes];
+  //RooHist *resids[nframes];
 
-  for (int i = 0; i < nframes; i++) {
-    data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
-                 Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
-    model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     DrawOption("F"), FillColor(kRed));
-    model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     DrawOption("F"), FillColor(kViolet),
-                     Components("*misID*,*sigmu*,*D1*"));
-    model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     DrawOption("F"), FillColor(kBlue + 1),
-                     Components("*misID*,*sigmu*"));
-    model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
-                     DrawOption("F"), FillColor(kOrange),
-                     Components("*misID*"));
-    resids[i] = drawframes[i]->pullHist();
-    data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
-                 Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
-  }
+  //for (int i = 0; i < nframes; i++) {
+    //data->plotOn(drawframes[i], DataError(RooAbsData::Poisson),
+                 //Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
+    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
+                     //DrawOption("F"), FillColor(kRed));
+    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
+                     //DrawOption("F"), FillColor(kViolet),
+                     //Components("*misID*,*sigmu*,*D1*"));
+    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
+                     //DrawOption("F"), FillColor(kBlue + 1),
+                     //Components("*misID*,*sigmu*"));
+    //model_hf->plotOn(drawframes[i], Slice(*idx), ProjWData(*idx, *data),
+                     //DrawOption("F"), FillColor(kOrange),
+                     //Components("*misID*"));
+    //resids[i] = drawframes[i]->pullHist();
+  //}
 
   cout << "Plot fit variables..." << endl;
-  auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
+  auto fit_var_frames = plotC1(
+      std::vector<RooRealVar*>{x, y, z}, {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, model_hf, idx);
+  //auto fit_var_frames  = vector<RooPlot *>{mm2_frame, El_frame, q2_frame};
   auto fit_var_anchors = vector<double>{8.7, 2250, 11.1e6};
 
   auto c1 = plotFitVars(fit_var_frames, fit_var_anchors, "c1", 1000, 300);
@@ -665,6 +665,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     z->setRange(rangenames[i], binlow, binhigh);
   }
 
+  slowplots = false;
   if (slowplots == true) {
     cout << "Drawing Slow Plots" << endl;
     for (int i = 0; i < q2_bins; i++) {
