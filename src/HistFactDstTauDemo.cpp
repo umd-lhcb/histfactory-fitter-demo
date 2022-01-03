@@ -64,6 +64,9 @@
 #define UNBLIND
 
 using namespace std;
+using namespace RooFit;
+using namespace RooStats;
+using namespace HistFactory;
 
 /////////////
 // Helpers //
@@ -72,12 +75,8 @@ using namespace std;
 unique_ptr<TDatime> get_date() { return make_unique<TDatime>(); }
 
 void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
-  using namespace RooFit;
-  using namespace RooStats;
-  using namespace HistFactory;
-
-  RooMsgService::instance().setGlobalKillBelow(
-      RooFit::ERROR);  // avoid accidental unblinding!
+  // avoid accidental unblinding!
+  RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 
   // Below: Read histogram file to generate normalization constants required to
   // make each histo normalized to unity. Not totally necessary here, but
@@ -85,6 +84,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
   TFile   q(inputFile);
   TH1 *   htemp;
+
   TString mchistos[3] = {"sigmu", "sigtau", "D1"};
   double  mcN_sigmu, mcN_sigtau, mcN_D1;
   double *mcnorms[3] = {&mcN_sigmu, &mcN_sigtau, &mcN_D1};
@@ -119,8 +119,8 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
   // Set the prefix that will appear before
   // all output for this measurement
-  RooStats::HistFactory::Measurement meas("my_measurement", "my measurement");
-  meas.SetOutputFilePrefix("results/my_measurement");
+  RooStats::HistFactory::Measurement meas("DstDemo", "DstDemo");
+  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output"));
   meas.SetExportOnly(kTRUE);  // Tells histfactory to not run the fit and
                               // display results using its own
 
@@ -354,11 +354,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   RooAbsArg *tempvar;
   RooArgSet *theVars = (RooArgSet *)allpars->Clone();
   theVars->add(poierror);
-  RooDataSet *toyresults = new RooDataSet("toyresults", "toyresults", *theVars,
-                                          StoreError(*theVars));
-  RooDataSet *toyminos =
-      new RooDataSet("toyminos", "toyminos", *theVars, StoreError(*theVars));
-  // The following code is very messy. Sorry.
 
   if (dofit) {  // return;
     nll_hf = model_hf->createNLL(*data, Offset(kTRUE));
@@ -429,9 +424,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     if (dofit)
       printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
              sw.RealTime(), sw3.RealTime());
-  }
-  if (toyMC) {
-    printf("Stopwatch: Generated test data in %f seconds\n", sw2.RealTime());
   }
 
   ///////////
