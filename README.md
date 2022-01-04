@@ -1,5 +1,9 @@
 # histfactory-fitter-demo
-Phoebe's demo R(D*) HistFactory fitter. For more info, take a look at [this TWiki](https://twiki.cern.ch/twiki/bin/viewauth/LHCbPhysics/HistFactoryInfo).
+
+A simple HistFactory fitter based on Phoebe's demo R(D*) fitter.
+
+For more info on Phoebe's original fitter, take a look at [this TWiki](https://twiki.cern.ch/twiki/bin/viewauth/LHCbPhysics/HistFactoryInfo).
+For a more faithful presentation of Phoebe's code, take a look at version [`0.1.1`](https://github.com/umd-lhcb/histfactory-fitter-demo/tree/0.1.1).
 
 
 ## How to run this demo
