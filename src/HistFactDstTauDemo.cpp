@@ -1,12 +1,7 @@
-#include <stdio.h>
-#include <iostream>
 
-#include "TCanvas.h"
 #include "TDatime.h"
 #include "TH3.h"
 #include "TIterator.h"
-#include "TLatex.h"
-#include "TLegend.h"
 #include "TRandom3.h"
 #include "TStopwatch.h"
 
@@ -52,6 +47,9 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <iostream>
+
+#include <stdio.h>
 
 // Third-party headers
 #include <cxxopts.hpp>
@@ -128,7 +126,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // Set the prefix that will appear before
   // all output for this measurement
   RooStats::HistFactory::Measurement meas("DstDemo", "DstDemo");
-  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/"));
+  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/fit_"));
   meas.SetExportOnly(kTRUE);  // Tells histfactory to not run the fit and
                               // display results using its own
 
@@ -169,10 +167,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   for (auto& t : templates) {
     t(inputFile.Data(), chan, params, addParams);
   }
-
-  //addMcNorm(inputFile.Data(), chan, params, addParams);
-  //addMcSig(inputFile.Data(), chan, params, addParams);
-  //addMcD1(inputFile.Data(), chan, params, addParams);
 
   /*********************** MisID BKG (FROM DATA)*******************************/
 
