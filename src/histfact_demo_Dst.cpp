@@ -401,7 +401,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
 int main(int argc, char **argv) {
   // Parser ////////////////////////////////////////////////////////////////////
-  cxxopts::Options argOpts("HistFactDstTauDemo",
+  cxxopts::Options argOpts("histfact_demo_Dst",
                            "a demo R(D*) HistFactory fitter.");
 
   // clang-format off

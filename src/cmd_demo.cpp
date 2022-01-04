@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 11, 2021 at 05:06 PM +0200
+// Last Change: Tue Jan 04, 2022 at 04:14 AM +0100
 
 #include <iostream>
 #include <string>
@@ -17,7 +17,7 @@ T SUM(T, T);
 
 int main(int argc, char** argv) {
   // Define command line parser
-  cxxopts::Options argparse("CmdArgDemo",
+  cxxopts::Options argparse("cmd_demo",
                             "a demo for parsing command line options");
 
   // clang-format off
