@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 03:48 AM +0100
+// Last Change: Tue Jan 04, 2022 at 04:43 PM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -49,6 +49,8 @@ void addMcSig(const char* ntp, RooStats::HistFactory::Channel& chan,
     sample.AddHistoSys("v2mu", "h_sigtau_v2m", ntp, "", "h_sigtau_v2p", ntp,
                        "");
     sample.AddHistoSys("v3mu", "h_sigtau_v3m", ntp, "", "h_sigtau_v3p", ntp,
+                       "");
+    sample.AddHistoSys("v4tau", "h_sigtau_v4m", ntp, "", "h_sigtau_v4p", ntp,
                        "");
   }
 
