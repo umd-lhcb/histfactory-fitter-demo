@@ -238,10 +238,6 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
       ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
   theIW->Print("V");
 
-  auto poi = static_cast<RooRealVar *>(
-      mc->GetParametersOfInterest()->createIterator()->Next());
-  cout << "Param of Interest: " << poi->GetName() << endl;
-
   // Lets tell roofit the right names for our histogram variables //
   auto obs = static_cast<const RooArgSet *>(mc->GetObservables());
 
@@ -276,33 +272,39 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   unique_ptr<HistFactorySimultaneous> modelHf(
       new HistFactorySimultaneous(*model));
 
+  auto poi = static_cast<RooRealVar *>(
+      mc->GetParametersOfInterest()->createIterator()->Next());
+  cout << "Param of Interest: " << poi->GetName() << endl;
+
   cout << "Saving PDF snapshot" << endl;
-  RooArgSet *allpars;
-  allpars = (RooArgSet *)((RooArgSet *)mc->GetNuisanceParameters())->Clone();
-  allpars->add(*poi);
-  RooArgSet *constraints;
-  constraints = (RooArgSet *)mc->GetConstraintParameters();
-  if (constraints != NULL) allpars->add(*constraints);
-  ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
-  RooRealVar poierror("poierror", "poierror", 0.00001, 0.010);
-  TIterator *iter = allpars->createIterator();
-  RooAbsArg *tempvar;
-  RooArgSet *theVars = (RooArgSet *)allpars->Clone();
-  theVars->add(poierror);
+  auto allPars = static_cast<RooArgSet *>(
+      (static_cast<const RooArgSet *>(mc->GetNuisanceParameters()))->Clone());
+  allPars->add(*poi);
 
-  auto data   = static_cast<RooAbsData *>(ws->data("obsData"));
-  auto nll_hf = modelHf->createNLL(*data, Offset(kTRUE));
+  auto constraints =
+      static_cast<const RooArgSet *>(mc->GetConstraintParameters());
+  if (constraints != nullptr) allPars->add(*constraints);
 
-  RooMinuit *minuit_hf = new RooMinuit(*nll_hf);
-  RooArgSet *temp      = new RooArgSet();
-  nll_hf->getParameters(temp)->Print("V");
-  minuit_hf->setErrorLevel(0.5);
+  ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
+
+  RooRealVar poiErr("poierror", "poierror", 0.00001, 0.010);
+  auto       theVars = static_cast<RooArgSet *>(allPars->Clone());
+  theVars->add(poiErr);
+
+  auto data  = static_cast<RooAbsData *>(ws->data("obsData"));
+  auto nllHf = modelHf->createNLL(*data, Offset(kTRUE));
+
+  unique_ptr<RooArgSet> temp(new RooArgSet());
+  nllHf->getParameters(temp.get())->Print("V");
+
+  unique_ptr<RooMinuit> minuitHf(new RooMinuit(*nllHf));
+  minuitHf->setErrorLevel(0.5);
 
 #ifndef UNBLIND
-  minuit_hf->setPrintLevel(-1);
+  minuitHf->setPrintLevel(-1);
 #endif
 
-  ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
+  ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
   swPrep.Stop();
 
   cout << "********************************************************************"
@@ -313,17 +315,20 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   ////////////
 
   cout << "Minimizing the Minuit (Migrad)" << endl;
+
   TStopwatch swFit;
   swFit.Reset();
   swFit.Start();
-  minuit_hf->setStrategy(2);
-  minuit_hf->fit("smh");
-  RooFitResult *tempResult = minuit_hf->save("TempResult", "TempResult");
+
+  minuitHf->setStrategy(2);
+  minuitHf->fit("smh");
+  RooFitResult *tempResult = minuitHf->save("TempResult", "TempResult");
 
   cout << tempResult->edm() << endl;
-  if (useMinos) minuit_hf->minos(RooArgSet(*poi));
+  if (useMinos) minuitHf->minos(RooArgSet(*poi));
+  auto result = minuitHf->save("Result", "Result");
+
   swFit.Stop();
-  auto result = minuit_hf->save("Result", "Result");
 
   if (result != nullptr) {
     printf("Fit ran with status %d\n", result->status());
