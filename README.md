@@ -11,8 +11,8 @@ For a more faithful presentation of Phoebe's code, take a look at version [`0.1.
 1. Install `nix` as instructed [here](https://github.com/umd-lhcb/root-curated#install-nix-on-macos).
 2. Type `nix develop`.
 3. In the resulting shell prompt, type `make fit`.
-    - The fit outputs are stored in `gen`.
-    - Some diagnostics outputs are in `results`.
+    - Fit plot is stored in `gen`.
+    - Full fit outputs are in `gen/fit_output`.
     - Fit log are timestamped and stored in `logs`.
 
 
@@ -20,7 +20,7 @@ For a more faithful presentation of Phoebe's code, take a look at version [`0.1.
 
 1. Run `make clean`.
 
-    **Note**: This will delete everything inside `gen` and the `results` folder.
+    **Note**: This will delete everything inside `gen` folder.
 
 2. Edit `flake.nix` to pick the ROOT version you want to use:
 
