@@ -80,7 +80,8 @@ using namespace HistFactory;
 typedef map<TString, double>         NuParamKeyVal;
 typedef map<TString, vector<double>> NuParamKeyRange;
 
-void setNuisanceParamConst(ModelConfig *mc, vector<TString> params, bool verbose=false) {
+void setNuisanceParamConst(ModelConfig *mc, vector<TString> params,
+                           bool verbose = false) {
   for (const auto &p : params) {
     auto nuParam =
         static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(p));
@@ -111,7 +112,7 @@ void fixNuisanceParams(ModelConfig *mc) {
   vector<TString> mcHistos{"sigmu", "sigtau", "D1"};
   vector<TString> params{};
   for (auto h : mcHistos) {
-    params.push_back("mcNorm_"+h);
+    params.push_back("mcNorm_" + h);
   }
 
   setNuisanceParamConst(mc, params, true);
@@ -175,15 +176,15 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   addParams.set("mcNorm_sigTau", mcN_sigtau);
   addParams.set("mcNorm_D1", mcN_D1);
 
-  ///////////////////////////
-  // Basic fitter settings //
-  ///////////////////////////
+  ///////////////////////
+  // Initialize fitter //
+  ///////////////////////
 
-  TStopwatch swLoadConfig;
-  swLoadConfig.Reset();
-  swLoadConfig.Start();
+  TStopwatch swPrep;
+  swPrep.Reset();
+  swPrep.Start();
 
-  const bool useMinos       = true;
+  const bool useMinos = true;
 
   // Set the prefix that will appear before all output for this measurement
   RooStats::HistFactory::Measurement meas("demo", "demo");
@@ -272,11 +273,10 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   // Barlow-Beeston lite. Otherwise, every bin gets a minuit variable to
   // minimize over!  This class, on the other hand, allows a likelihood where
   // the bin parameters are analytically minimized at each step
-  HistFactorySimultaneous *model_hf = new HistFactorySimultaneous(*model);
-  RooAbsReal *             nll_hf;
-  RooFitResult *           result;
+  unique_ptr<HistFactorySimultaneous> modelHf(
+      new HistFactorySimultaneous(*model));
 
-  cerr << "Saving PDF snapshot" << endl;
+  cout << "Saving PDF snapshot" << endl;
   RooArgSet *allpars;
   allpars = (RooArgSet *)((RooArgSet *)mc->GetNuisanceParameters())->Clone();
   allpars->add(*poi);
@@ -290,22 +290,22 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   RooArgSet *theVars = (RooArgSet *)allpars->Clone();
   theVars->add(poierror);
 
-  auto data = static_cast<RooAbsData *>(ws->data("obsData"));
-
-  nll_hf = model_hf->createNLL(*data, Offset(kTRUE));
+  auto data   = static_cast<RooAbsData *>(ws->data("obsData"));
+  auto nll_hf = modelHf->createNLL(*data, Offset(kTRUE));
 
   RooMinuit *minuit_hf = new RooMinuit(*nll_hf);
   RooArgSet *temp      = new RooArgSet();
   nll_hf->getParameters(temp)->Print("V");
   minuit_hf->setErrorLevel(0.5);
+
 #ifndef UNBLIND
   minuit_hf->setPrintLevel(-1);
 #endif
 
   ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
-  swLoadConfig.Stop();
+  swPrep.Stop();
 
-  cout << "******************************************************************"
+  cout << "********************************************************************"
        << endl;
 
   ////////////
@@ -313,23 +313,21 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   ////////////
 
   cout << "Minimizing the Minuit (Migrad)" << endl;
-  TStopwatch sw;
-  sw.Reset();
-  sw.Start();
+  TStopwatch swFit;
+  swFit.Reset();
+  swFit.Start();
   minuit_hf->setStrategy(2);
   minuit_hf->fit("smh");
   RooFitResult *tempResult = minuit_hf->save("TempResult", "TempResult");
 
   cout << tempResult->edm() << endl;
   if (useMinos) minuit_hf->minos(RooArgSet(*poi));
-  sw.Stop();
-  result = minuit_hf->save("Result", "Result");
+  swFit.Stop();
+  auto result = minuit_hf->save("Result", "Result");
 
-  if (result != NULL) {
+  if (result != nullptr) {
     printf("Fit ran with status %d\n", result->status());
-
     printf("Stat error on R(D*) is %f\n", poi->getError());
-
     printf("EDM at end was %f\n", result->edm());
 
     result->floatParsInit().Print();
@@ -359,7 +357,7 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
     result->correlationMatrix().Print();
 
     printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
-           sw.RealTime(), swLoadConfig.RealTime());
+           swFit.RealTime(), swPrep.RealTime());
   }
 
   ///////////
@@ -374,7 +372,7 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   auto idx = static_cast<RooCategory *>(obs->find("channelCat"));
   auto fitVarFrames =
       plotC1(std::vector<RooRealVar *>{x, y, z},
-             {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, model_hf, idx);
+             {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, modelHf.get(), idx);
   auto fitVarAnchors = vector<double>{8.7, 2250, 11.1e6};
 
   auto c1 = plotFitVars(fitVarFrames, fitVarAnchors, "c1", 1000, 300);
