@@ -1,0 +1,479 @@
+
+[1mRooFit v3.60 -- Developed by Wouter Verkerke and David Kirkby[0m 
+                Copyright (C) 2000-2013 NIKHEF, University of California & Stanford University
+                All rights reserved, please read http://roofit.sourceforge.net/license.txt
+
+mcN_sigmu = 315000
+mcN_sigtau = 10799.7
+mcN_D1 = 8908.2
+--- RooAbsArg ---
+  Value State: DIRTY
+  Shape State: DIRTY
+  Attributes: 
+  Address: 0x7ffc76bb7eb0
+  Clients: 
+  Servers: 
+    (0x3177ed0,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alphanominal ""
+    (0x3d56460,V-) RooRealVar::obs_x_Dstmu_kinematic "obs_x_Dstmu_kinematic"
+    (0x34b8af0,V-) RooRealVar::obs_y_Dstmu_kinematic "obs_y_Dstmu_kinematic"
+    (0x39c4ca0,V-) RooRealVar::obs_z_Dstmu_kinematic "obs_z_Dstmu_kinematic"
+    (0x3ebdc00,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_0low ""
+    (0x38385b0,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_1low ""
+    (0x3d4b480,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_2low ""
+    (0x37b48b0,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_0high ""
+    (0x3d4dee0,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_1high ""
+    (0x38c5580,V-) RooHistFunc::h_sigmu_Dstmu_kinematic_Hist_alpha_2high ""
+    (0x36f4a90,V-) RooRealVar::alpha_v1mu "alpha_v1mu"
+    (0x35ba3e0,V-) RooRealVar::alpha_v2mu "alpha_v2mu"
+    (0x3e460e0,V-) RooRealVar::alpha_v3mu "alpha_v3mu"
+  Proxies: 
+    !depList -> 
+      1)  obs_x_Dstmu_kinematic
+      2)  obs_y_Dstmu_kinematic
+      3)  obs_z_Dstmu_kinematic
+    !nominal -> h_sigmu_Dstmu_kinematic_Hist_alphanominal
+    !lowSet -> 
+      1)  h_sigmu_Dstmu_kinematic_Hist_alpha_0low
+      2)  h_sigmu_Dstmu_kinematic_Hist_alpha_1low
+      3)  h_sigmu_Dstmu_kinematic_Hist_alpha_2low
+    !highSet -> 
+      1)  h_sigmu_Dstmu_kinematic_Hist_alpha_0high
+      2)  h_sigmu_Dstmu_kinematic_Hist_alpha_1high
+      3)  h_sigmu_Dstmu_kinematic_Hist_alpha_2high
+    !paramSet -> 
+      1)  alpha_v1mu
+      2)  alpha_v2mu
+      3)  alpha_v3mu
+--- RooAbsReal ---
+
+  Plot label is "h_sigmu_Dstmu_kinematic_Hist_alpha"
+--- RooAbsArg ---
+  Value State: DIRTY
+  Shape State: DIRTY
+  Attributes: 
+  Address: 0x7ffc76bb7eb0
+  Clients: 
+  Servers: 
+    (0x5db66c0,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alphanominal ""
+    (0x3d56460,V-) RooRealVar::obs_x_Dstmu_kinematic "obs_x_Dstmu_kinematic"
+    (0x34b8af0,V-) RooRealVar::obs_y_Dstmu_kinematic "obs_y_Dstmu_kinematic"
+    (0x39c4ca0,V-) RooRealVar::obs_z_Dstmu_kinematic "obs_z_Dstmu_kinematic"
+    (0x5b4c2a0,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_0low ""
+    (0x633bb70,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_1low ""
+    (0x4f18660,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_2low ""
+    (0x5dae2b0,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_3low ""
+    (0x51dc310,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_0high ""
+    (0x5e118b0,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_1high ""
+    (0x5b44490,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_2high ""
+    (0x5db2a40,V-) RooHistFunc::h_sigtau_Dstmu_kinematic_Hist_alpha_3high ""
+    (0x36f4a90,V-) RooRealVar::alpha_v1mu "alpha_v1mu"
+    (0x35ba3e0,V-) RooRealVar::alpha_v2mu "alpha_v2mu"
+    (0x3e460e0,V-) RooRealVar::alpha_v3mu "alpha_v3mu"
+    (0x50e9dc0,V-) RooRealVar::alpha_v4tau "alpha_v4tau"
+  Proxies: 
+    !depList -> 
+      1)  obs_x_Dstmu_kinematic
+      2)  obs_y_Dstmu_kinematic
+      3)  obs_z_Dstmu_kinematic
+    !nominal -> h_sigtau_Dstmu_kinematic_Hist_alphanominal
+    !lowSet -> 
+      1)  h_sigtau_Dstmu_kinematic_Hist_alpha_0low
+      2)  h_sigtau_Dstmu_kinematic_Hist_alpha_1low
+      3)  h_sigtau_Dstmu_kinematic_Hist_alpha_2low
+      4)  h_sigtau_Dstmu_kinematic_Hist_alpha_3low
+    !highSet -> 
+      1)  h_sigtau_Dstmu_kinematic_Hist_alpha_0high
+      2)  h_sigtau_Dstmu_kinematic_Hist_alpha_1high
+      3)  h_sigtau_Dstmu_kinematic_Hist_alpha_2high
+      4)  h_sigtau_Dstmu_kinematic_Hist_alpha_3high
+    !paramSet -> 
+      1)   alpha_v1mu
+      2)   alpha_v2mu
+      3)   alpha_v3mu
+      4)  alpha_v4tau
+--- RooAbsReal ---
+
+  Plot label is "h_sigtau_Dstmu_kinematic_Hist_alpha"
+--- RooAbsArg ---
+  Value State: DIRTY
+  Shape State: DIRTY
+  Attributes: 
+  Address: 0x7ffc76bb7eb0
+  Clients: 
+  Servers: 
+    (0x6d80a90,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alphanominal ""
+    (0x3d56460,V-) RooRealVar::obs_x_Dstmu_kinematic "obs_x_Dstmu_kinematic"
+    (0x34b8af0,V-) RooRealVar::obs_y_Dstmu_kinematic "obs_y_Dstmu_kinematic"
+    (0x39c4ca0,V-) RooRealVar::obs_z_Dstmu_kinematic "obs_z_Dstmu_kinematic"
+    (0x50a35d0,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alpha_0low ""
+    (0x4c7b340,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alpha_0high ""
+    (0x5ce2230,V-) RooRealVar::alpha_IW "alpha_IW"
+  Proxies: 
+    !depList -> 
+      1)  obs_x_Dstmu_kinematic
+      2)  obs_y_Dstmu_kinematic
+      3)  obs_z_Dstmu_kinematic
+    !nominal -> h_D1_Dstmu_kinematic_Hist_alphanominal
+    !lowSet -> 
+      1)  h_D1_Dstmu_kinematic_Hist_alpha_0low
+    !highSet -> 
+      1)  h_D1_Dstmu_kinematic_Hist_alpha_0high
+    !paramSet -> 
+      1)  alpha_IW
+--- RooAbsReal ---
+
+  Plot label is "h_D1_Dstmu_kinematic_Hist_alpha"
+--- RooAbsArg ---
+  Value State: DIRTY
+  Shape State: DIRTY
+  Attributes:  [SnapShot_ExtRefClone] 
+  Address: 0xdbf5c80
+  Clients: 
+    (0xdbf4ad0,V-) RooProduct::h_D1_Dstmu_kinematic_overallSyst_x_HistSyst "h_D1_Dstmu_kinematic_overallSyst_x_HistSyst"
+  Servers: 
+    (0xdc046b0,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alphanominal ""
+    (0xdc06a80,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alpha_0low ""
+    (0xdc08e90,V-) RooHistFunc::h_D1_Dstmu_kinematic_Hist_alpha_0high ""
+    (0xbd728b0,V-) RooRealVar::alpha_IW "alpha_IW"
+    (0xabd7770,V-) RooRealVar::obs_x_Dstmu_kinematic "obs_x_Dstmu_kinematic"
+    (0xabfe270,V-) RooRealVar::obs_y_Dstmu_kinematic "obs_y_Dstmu_kinematic"
+    (0xabfe9d0,V-) RooRealVar::obs_z_Dstmu_kinematic "obs_z_Dstmu_kinematic"
+  Proxies: 
+    !depList -> 
+      1)  obs_x_Dstmu_kinematic
+      2)  obs_y_Dstmu_kinematic
+      3)  obs_z_Dstmu_kinematic
+    !nominal -> h_D1_Dstmu_kinematic_Hist_alphanominal
+    !lowSet -> 
+      1)  h_D1_Dstmu_kinematic_Hist_alpha_0low
+    !highSet -> 
+      1)  h_D1_Dstmu_kinematic_Hist_alpha_0high
+    !paramSet -> 
+      1)  alpha_IW
+--- RooAbsReal ---
+
+  Plot label is "h_D1_Dstmu_kinematic_Hist_alpha"
+Param of Interest: RawRDst
+mcNorm_sigmu = 3.1746e-06
+mcNorm_sigtau = 9.25955e-05
+mcNorm_D1 = 0.000112256
+Saving PDF snapshot
+DEBUG MESSAGE: USING PHOEBE'S PATCH
+DEBUG MESSAGE: LOOPING OVER 5120 BINS
+DEBUG MESSAGE: DONE!
+Getting the RooRealSumPdf for the channel: model_Dstmu_kinematic
+Found RooRealSumPdf: Dstmu_kinematic_model
+Adding channel: model_Dstmu_kinematic to the barlow cache
+  1) RooRealVar::                                                                         Lumi = 1
+  2) RooRealVar::                                                                      NDstst0 = 0.102
+  3) RooRealVar::                                                                       NmisID = 1
+  4) RooRealVar::                                                                          Nmu = 50000
+  5) RooRealVar::                                                                      RawRDst = 0.0403349
+  6) RooRealVar::                                                                   alpha_BFD1 = 0
+  7) RooRealVar::                                                                     alpha_IW = 0
+  8) RooRealVar::                                                                   alpha_v1mu = 0
+  9) RooRealVar::                                                                   alpha_v2mu = 0
+ 10) RooRealVar::                                                                   alpha_v3mu = 0
+ 11) RooRealVar::                                                                  alpha_v4tau = 0
+ 12) RooRealVar:: binWidth_obs_x_Dstmu_kinematic_obs_y_Dstmu_kinematic_obs_z_Dstmu_kinematic_0 = 1.36752e-08
+ 13) RooRealVar:: binWidth_obs_x_Dstmu_kinematic_obs_y_Dstmu_kinematic_obs_z_Dstmu_kinematic_1 = 1.36752e-08
+ 14) RooRealVar:: binWidth_obs_x_Dstmu_kinematic_obs_y_Dstmu_kinematic_obs_z_Dstmu_kinematic_2 = 1.36752e-08
+ 15) RooRealVar:: binWidth_obs_x_Dstmu_kinematic_obs_y_Dstmu_kinematic_obs_z_Dstmu_kinematic_3 = 1.36752e-08
+ 16) RooRealVar::                                                                          fD1 = 3.2
+ 17) RooRealVar::                                                                    mcNorm_D1 = 0.000112256
+ 18) RooRealVar::                                                                 mcNorm_sigmu = 3.1746e-06
+ 19) RooRealVar::                                                                mcNorm_sigtau = 9.25955e-05
+ 20) RooRealVar::                                                               nom_alpha_BFD1 = 0
+ 21) RooRealVar::                                                                 nom_alpha_IW = 0
+ 22) RooRealVar::                                                               nom_alpha_v1mu = 0
+ 23) RooRealVar::                                                               nom_alpha_v2mu = 0
+ 24) RooRealVar::                                                               nom_alpha_v3mu = 0
+ 25) RooRealVar::                                                              nom_alpha_v4tau = 0
+ 26) RooRealVar::                                                                  nominalLumi = 1
+**********************************************************************
+ **********
+ **    9 **SET ERR         0.5
+ **********
+Minimizing the Minuit (Migrad)
+ **********
+ **   10 **SET STR           2
+ **********
+ NOW USING STRATEGY  2: MAKE SURE MINIMUM TRUE, ERRORS CORRECT  
+ **********
+ **   15 **HESSE        4500
+ **********
+ FIRST CALL TO USER FUNCTION AT NEW START POINT, WITH IFLAG=4.
+ MINUIT WARNING IN HESSE   
+ ============== Negative diagonal element 9 in Error Matrix
+ MINUIT WARNING IN HESSE   
+ ============== 54.1168 added to diagonal of error matrix
+ EIGENVALUES OF SECOND-DERIVATIVE MATRIX:
+        -6.1260e-01  2.1926e-01  4.3303e-01  7.8542e-01  9.0626e-01  1.0462e+00  1.2934e+00  1.7116e+00  3.2174e+00
+ MINUIT WARNING IN HESSE   
+ ============== MATRIX FORCED POS-DEF BY ADDING 0.615820 TO DIAGONAL.
+ FCN=-1657.62 FROM HESSE     STATUS=NOT POSDEF     93 CALLS          94 TOTAL
+                     EDM=1739.31    STRATEGY= 2      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE     INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Lumi         1.00000e+00   6.15288e-02   6.77203e-03  -9.27295e-01
+   2  Nmu          5.00000e+04   4.51153e+02   1.18625e-03  -1.11977e+00
+   3  RawRDst      4.03349e-02   3.95809e-02   3.97512e-02  -6.39331e-01
+   4  alpha_BFD1   0.00000e+00   4.02749e-01   3.39973e-02   0.00000e+00
+   5  alpha_IW     0.00000e+00   6.37135e-01   4.85131e-02   0.00000e+00
+   6  alpha_v1mu   0.00000e+00   7.69867e-01   7.81590e-02   0.00000e+00
+   7  alpha_v2mu   0.00000e+00   6.26836e-01   1.04648e-01   0.00000e+00
+   8  alpha_v3mu   0.00000e+00   5.62685e-01   9.23932e-02   0.00000e+00
+   9  alpha_v4tau   0.00000e+00   7.47246e+00   1.17949e-01   0.00000e+00
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  54    NPAR=  9    ERR DEF=0.5
+  3.786e-03  2.370e+01 -2.407e-03  2.258e-02 -3.581e-02 -3.493e-02 -1.696e-02  1.196e-02 -3.105e+00 
+  2.370e+01  2.035e+05 -1.732e+01  1.594e+02 -2.642e+02 -2.585e+02 -1.245e+02  8.569e+01 -2.269e+04 
+ -2.407e-03 -1.732e+01  1.713e-03 -1.627e-02  2.598e-02  2.533e-02  1.216e-02 -8.462e-03  2.237e+00 
+  2.258e-02  1.594e+02 -1.627e-02  1.632e-01 -2.476e-01 -2.398e-01 -1.138e-01  7.957e-02 -2.128e+01 
+ -3.581e-02 -2.642e+02  2.598e-02 -2.476e-01  4.122e-01  3.897e-01  1.855e-01 -1.398e-01  3.419e+01 
+ -3.493e-02 -2.585e+02  2.533e-02 -2.398e-01  3.897e-01  5.945e-01  1.682e-01 -1.205e-01  3.307e+01 
+ -1.696e-02 -1.245e+02  1.216e-02 -1.138e-01  1.855e-01  1.682e-01  3.937e-01 -5.456e-02  1.592e+01 
+  1.196e-02  8.569e+01 -8.462e-03  7.957e-02 -1.398e-01 -1.205e-01 -5.456e-02  3.171e-01 -1.107e+01 
+ -3.105e+00 -2.269e+04  2.237e+00 -2.128e+01  3.419e+01  3.307e+01  1.592e+01 -1.107e+01  2.941e+03 
+ERR MATRIX NOT POS-DEF
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      6      7      8      9
+        1  0.95757   1.000  0.854 -0.945  0.909 -0.906 -0.736 -0.439  0.345 -0.930
+        2  0.93918   0.854  1.000 -0.927  0.875 -0.912 -0.743 -0.440  0.337 -0.927
+        3  0.99794  -0.945 -0.927  1.000 -0.973  0.978  0.794  0.468 -0.363  0.996
+        4  0.97705   0.909  0.875 -0.973  1.000 -0.955 -0.770 -0.449  0.350 -0.971
+        5  0.98292  -0.906 -0.912  0.978 -0.955  1.000  0.787  0.460 -0.387  0.982
+        6  0.79783  -0.736 -0.743  0.794 -0.770  0.787  1.000  0.348 -0.278  0.791
+        7  0.47173  -0.439 -0.440  0.468 -0.449  0.460  0.348  1.000 -0.154  0.468
+        8  0.40176   0.345  0.337 -0.363  0.350 -0.387 -0.278 -0.154  1.000 -0.362
+        9  0.99737  -0.930 -0.927  0.996 -0.971  0.982  0.791  0.468 -0.362  1.000
+ ERR MATRIX NOT POS-DEF
+ **********
+ **   20 **MIGRAD        4500           1
+ **********
+ START MIGRAD MINIMIZATION.  STRATEGY  2.  CONVERGENCE WHEN EDM .LT. 1.00e-03
+ MINUIT WARNING IN HESSE   
+ ============== Negative diagonal element 9 in Error Matrix
+ MINUIT WARNING IN HESSE   
+ ============== 54.1784 added to diagonal of error matrix
+ EIGENVALUES OF SECOND-DERIVATIVE MATRIX:
+        -5.4544e-01  2.0942e-01  4.3362e-01  7.8807e-01  9.0536e-01  1.0456e+00  1.2847e+00  1.7033e+00  3.1754e+00
+ MINUIT WARNING IN HESSE   
+ ============== MATRIX FORCED POS-DEF BY ADDING 0.548611 TO DIAGONAL.
+ FCN=-1657.62 FROM HESSE     STATUS=NOT POSDEF     79 CALLS         173 TOTAL
+                     EDM=887.477    STRATEGY= 2      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Lumi         1.00000e+00   6.65772e-02   1.49634e-04  -1.65255e+03
+   2  Nmu          5.00000e+04   4.44751e+02   1.79670e-05  -5.59223e+04
+   3  RawRDst      4.03349e-02   4.00348e-02   8.78628e-04  -4.61367e+02
+   4  alpha_BFD1   0.00000e+00   4.19093e-01   7.52424e-04  -8.06259e+02
+   5  alpha_IW     0.00000e+00   6.33788e-01   1.07069e-03  -5.12013e+01
+   6  alpha_v1mu   0.00000e+00   7.87995e-01   7.80804e-02  -3.47740e+01
+   7  alpha_v2mu   0.00000e+00   6.44230e-01   2.29169e-03  -1.60980e+01
+   8  alpha_v3mu   0.00000e+00   5.70030e-01   2.04192e-03  -8.67212e+00
+   9  alpha_v4tau   0.00000e+00   7.43392e+00   1.17770e-01  -7.76520e-02
+                               ERR DEF= 0.5
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 2 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 3 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 5 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 9 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== 14.8456 added to diagonal of error matrix
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MINUIT WARNING IN HESSE   
+ ============== Negative diagonal element 4 in Error Matrix
+ MINUIT WARNING IN HESSE   
+ ============== Negative diagonal element 6 in Error Matrix
+ MINUIT WARNING IN HESSE   
+ ============== 380.392 added to diagonal of error matrix
+ EIGENVALUES OF SECOND-DERIVATIVE MATRIX:
+        -7.5372e+00 -1.7538e-01  7.4437e-01  9.4385e-01  9.9088e-01  1.0068e+00  1.1024e+00  1.3135e+00  1.0611e+01
+ MINUIT WARNING IN HESSE   
+ ============== MATRIX FORCED POS-DEF BY ADDING 7.547772 TO DIAGONAL.
+ FCN=-2299.56 FROM HESSE     STATUS=NOT POSDEF     73 CALLS         292 TOTAL
+                     EDM=762826    STRATEGY= 2      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Lumi         3.28742e-01   7.29611e-02   5.35258e-04  -2.51976e+03
+   2  Nmu          5.83717e+04   1.13775e+03   2.99263e-05  -3.18822e+04
+   3  RawRDst      8.47255e-02   6.45223e-03   7.65576e-04  -8.74871e+02
+   4  alpha_BFD1  -2.66940e+00   3.10306e+00   1.70024e-03  -2.19258e+02
+   5  alpha_IW     1.19339e+00   1.31842e-01   2.07009e-03  -9.81471e+01
+   6  alpha_v1mu   7.67856e+00   4.81245e-02   3.34521e-03   3.16907e+01
+   7  alpha_v2mu   5.14098e+00   1.31173e-01   1.16043e-02   4.54503e+01
+   8  alpha_v3mu  -2.50564e+00   1.51110e-01   3.40058e-03  -1.25972e+01
+   9  alpha_v4tau   4.60731e-01   9.21568e-02   4.54137e-03   3.95847e-01
+                               ERR DEF= 0.5
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 2 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== Negative diagonal element 4 in Error Matrix
+ MINUIT WARNING IN MIGRAD  
+ ============== 1.87271 added to diagonal of error matrix
+ MIGRAD FAILS TO FIND IMPROVEMENT
+ MINUIT WARNING IN HESSE   
+ ============== Negative diagonal element 6 in Error Matrix
+ MINUIT WARNING IN HESSE   
+ ============== 90.941 added to diagonal of error matrix
+ EIGENVALUES OF SECOND-DERIVATIVE MATRIX:
+        -7.8409e-01  5.8240e-02  2.2618e-01  8.2512e-01  9.2844e-01  1.0344e+00  1.3644e+00  1.5896e+00  3.7576e+00
+ MINUIT WARNING IN HESSE   
+ ============== MATRIX FORCED POS-DEF BY ADDING 0.787848 TO DIAGONAL.
+ FCN=-2422.53 FROM HESSE     STATUS=NOT POSDEF     73 CALLS         410 TOTAL
+                     EDM=40385.8    STRATEGY= 2      ERR MATRIX NOT POS-DEF
+  EXT PARAMETER                APPROXIMATE        STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Lumi         2.55374e-01   4.01392e-01   7.30926e-04  -2.39051e+03
+   2  Nmu          5.71555e+04   5.61942e+02   3.19154e-05  -2.11197e+04
+   3  RawRDst      7.78594e-02   2.07641e-02   7.85774e-04  -7.07843e+02
+   4  alpha_BFD1   6.24666e-01   1.11946e-01   1.74510e-03  -2.23931e+02
+   5  alpha_IW     1.05569e+00   3.75301e-01   1.65823e-03  -1.98009e+02
+   6  alpha_v1mu   7.69461e+00   1.38289e+01   3.43346e-03   2.82760e+01
+   7  alpha_v2mu   5.22315e+00   5.22238e-01   8.17968e-03   3.19415e+01
+   8  alpha_v3mu  -2.60348e+00   4.98617e-01   3.71198e-03   2.96836e-01
+   9  alpha_v4tau   4.14075e-01   4.48227e-01   2.55449e-03  -2.13932e+01
+                               ERR DEF= 0.5
+ MIGRAD MINIMIZATION HAS CONVERGED.
+ MIGRAD WILL VERIFY CONVERGENCE AND ERROR MATRIX.
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-3035.66 FROM MIGRAD    STATUS=CONVERGED     788 CALLS         882 TOTAL
+                     EDM=3.03326e-05    STRATEGY= 2      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Lumi         9.39240e-01   3.53528e-02   2.88994e-04   3.40051e-02
+   2  Nmu          6.37710e+04   4.36429e+02   3.80540e-05   1.35763e+00
+   3  RawRDst      4.05005e-02   4.39478e-03   1.14012e-03  -3.64685e-02
+   4  alpha_BFD1  -1.56665e+00   2.87728e-01   2.14065e-03   1.38945e-02
+   5  alpha_IW     2.10433e-01   1.68428e-01   1.94760e-03  -3.48532e-02
+   6  alpha_v1mu   7.60267e-01   7.78587e-01   3.52235e-03  -2.40704e-02
+   7  alpha_v2mu   3.19654e-01   9.23330e-01   4.31632e-03  -3.56748e-03
+   8  alpha_v3mu   1.89448e-01   8.72255e-01   3.88933e-03  -3.96244e-04
+   9  alpha_v4tau   6.17510e-02   1.65688e+00   1.28440e-02  -1.05772e-02
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  54    NPAR=  9    ERR DEF=0.5
+  1.250e-03 -2.662e+00 -1.136e-04  2.304e-03 -8.004e-04  1.220e-04 -2.018e-05  7.306e-04  5.523e-04 
+ -2.662e+00  1.905e+05  3.681e-01 -9.923e+01 -2.008e+00  2.917e+01 -4.974e+01  9.513e+00 -6.269e+00 
+ -1.136e-04  3.681e-01  1.933e-05 -5.664e-04  8.067e-06 -5.249e-04 -6.928e-05 -1.019e-04 -3.213e-04 
+  2.304e-03 -9.923e+01 -5.664e-04  8.314e-02  3.990e-03 -2.888e-03  3.758e-02 -6.582e-03  1.374e-02 
+ -8.004e-04 -2.008e+00  8.067e-06  3.990e-03  2.840e-02  2.234e-02  3.585e-03  4.800e-02  9.067e-03 
+  1.220e-04  2.917e+01 -5.249e-04 -2.888e-03  2.234e-02  6.081e-01  7.374e-02 -1.015e-02  1.219e-02 
+ -2.018e-05 -4.974e+01 -6.928e-05  3.758e-02  3.585e-03  7.374e-02  8.564e-01  3.312e-02  5.612e-04 
+  7.306e-04  9.513e+00 -1.019e-04 -6.582e-03  4.800e-02 -1.015e-02  3.312e-02  7.639e-01  7.199e-03 
+  5.523e-04 -6.269e+00 -3.213e-04  1.374e-02  9.067e-03  1.219e-02  5.612e-04  7.199e-03  2.852e+00 
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      6      7      8      9
+        1  0.77932   1.000 -0.173 -0.731  0.226 -0.134  0.004 -0.001  0.024  0.009
+        2  0.82853  -0.173  1.000  0.192 -0.789 -0.027  0.086 -0.123  0.025 -0.009
+        3  0.83657  -0.731  0.192  1.000 -0.447  0.011 -0.153 -0.017 -0.027 -0.043
+        4  0.86635   0.226 -0.789 -0.447  1.000  0.082 -0.013  0.141 -0.026  0.028
+        5  0.42067  -0.134 -0.027  0.011  0.082  1.000  0.170  0.023  0.326  0.032
+        6  0.32593   0.004  0.086 -0.153 -0.013  0.170  1.000  0.102 -0.015  0.009
+        7  0.19908  -0.001 -0.123 -0.017  0.141  0.023  0.102  1.000  0.041  0.000
+        8  0.35378   0.024  0.025 -0.027 -0.026  0.326 -0.015  0.041  1.000  0.005
+        9  0.06123   0.009 -0.009 -0.043  0.028  0.032  0.009  0.000  0.005  1.000
+ **********
+ **   25 **HESSE        4500
+ **********
+ COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+ FCN=-3035.66 FROM HESSE     STATUS=OK             73 CALLS         955 TOTAL
+                     EDM=3.04886e-05    STRATEGY= 2      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                INTERNAL      INTERNAL  
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE   
+   1  Lumi         9.39240e-01   3.53634e-02   5.77988e-05  -9.47831e-01
+   2  Nmu          6.37710e+04   4.35752e+02   7.61080e-06  -1.06021e+00
+   3  RawRDst      4.05005e-02   4.40570e-03   2.28023e-04   5.64592e+00
+   4  alpha_BFD1  -1.56665e+00   2.87529e-01   4.28130e-04   5.73374e+00
+   5  alpha_IW     2.10433e-01   1.68740e-01   3.89521e-04   3.07139e+00
+   6  alpha_v1mu   7.60267e-01   7.78733e-01   7.04469e-04   3.04642e+00
+   7  alpha_v2mu   3.19654e-01   9.23289e-01   8.63264e-04   3.99674e-02
+   8  alpha_v3mu   1.89448e-01   8.72359e-01   7.77867e-04   2.36832e-02
+   9  alpha_v4tau   6.17510e-02   1.67617e+00   5.13762e-04   1.35076e+02
+                               ERR DEF= 0.5
+ EXTERNAL ERROR MATRIX.    NDIM=  54    NPAR=  9    ERR DEF=0.5
+  1.251e-03 -2.656e+00 -1.138e-04  2.304e-03 -7.969e-04  1.269e-04 -2.449e-05  7.334e-04  9.482e-04 
+ -2.656e+00  1.899e+05  3.675e-01 -9.887e+01 -2.075e+00  2.904e+01 -4.950e+01  9.359e+00 -1.200e+01 
+ -1.138e-04  3.675e-01  1.943e-05 -5.690e-04  4.879e-06 -5.292e-04 -6.835e-05 -1.048e-04 -6.372e-04 
+  2.304e-03 -9.887e+01 -5.690e-04  8.302e-02  4.138e-03 -2.676e-03  3.742e-02 -6.391e-03  2.741e-02 
+ -7.969e-04 -2.075e+00  4.879e-06  4.138e-03  2.850e-02  2.249e-02  3.584e-03  4.811e-02  1.898e-02 
+  1.269e-04  2.904e+01 -5.292e-04 -2.676e-03  2.249e-02  6.084e-01  7.377e-02 -1.002e-02  2.521e-02 
+ -2.449e-05 -4.950e+01 -6.835e-05  3.742e-02  3.584e-03  7.377e-02  8.563e-01  3.319e-02  1.002e-03 
+  7.334e-04  9.359e+00 -1.048e-04 -6.391e-03  4.811e-02 -1.002e-02  3.319e-02  7.640e-01  1.468e-02 
+  9.482e-04 -1.200e+01 -6.372e-04  2.741e-02  1.898e-02  2.521e-02  1.002e-03  1.468e-02  2.922e+00 
+ PARAMETER  CORRELATION COEFFICIENTS  
+       NO.  GLOBAL      1      2      3      4      5      6      7      8      9
+        1  0.77947   1.000 -0.172 -0.730  0.226 -0.133  0.005 -0.001  0.024  0.016
+        2  0.82794  -0.172  1.000  0.191 -0.787 -0.028  0.085 -0.123  0.025 -0.016
+        3  0.83746  -0.730  0.191  1.000 -0.448  0.007 -0.154 -0.017 -0.027 -0.085
+        4  0.86615   0.226 -0.787 -0.448  1.000  0.085 -0.012  0.140 -0.025  0.056
+        5  0.42425  -0.133 -0.028  0.007  0.085  1.000  0.171  0.023  0.326  0.066
+        6  0.32641   0.005  0.085 -0.154 -0.012  0.171  1.000  0.102 -0.015  0.019
+        7  0.19885  -0.001 -0.123 -0.017  0.140  0.023  0.102  1.000  0.041  0.001
+        8  0.35403   0.024  0.025 -0.027 -0.025  0.326 -0.015  0.041  1.000  0.010
+        9  0.12257   0.016 -0.016 -0.085  0.056  0.066  0.019  0.001  0.010  1.000
+3.04886e-05
+ **********
+ **   30 **MINOS        4500           3
+ **********
+ FCN=-3035.66 FROM MINOS     STATUS=SUCCESSFUL    224 CALLS        1179 TOTAL
+                     EDM=3.04886e-05    STRATEGY= 2      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                  PARABOLIC         MINOS ERRORS        
+  NO.   NAME      VALUE            ERROR      NEGATIVE      POSITIVE   
+   1  Lumi         9.39240e-01   3.53634e-02                            
+   2  Nmu          6.37710e+04   4.35752e+02                            
+   3  RawRDst      4.05005e-02   4.40570e-03  -4.38284e-03   4.56005e-03
+   4  alpha_BFD1  -1.56665e+00   2.87529e-01                            
+   5  alpha_IW     2.10433e-01   1.68740e-01                            
+   6  alpha_v1mu   7.60267e-01   7.78733e-01                            
+   7  alpha_v2mu   3.19654e-01   9.23289e-01                            
+   8  alpha_v3mu   1.89448e-01   8.72359e-01                            
+   9  alpha_v4tau   6.17510e-02   1.67617e+00                            
+                               ERR DEF= 0.5
+Fit ran with status 0
+Stat error on R(D*) is 0.004406
+EDM at end was 0.000030
+RooArgList:: = (Lumi,Nmu,RawRDst,alpha_BFD1,alpha_IW,alpha_v1mu,alpha_v2mu,alpha_v3mu,alpha_v4tau)
+CURRENT NUISANCE PARAMETERS:
+0: Lumi			 = 0.93924 +/- 0.0353634
+1: Nmu			 = 63771 +/- 435.752
+3: alpha_BFD1			 = -1.56665 +/- 0.287529
+4: alpha_IW			 = 0.210433 +/- 0.16874
+5: alpha_v1mu			 = 0.760267 +/- 0.778733
+6: alpha_v2mu			 = 0.319654 +/- 0.923289
+7: alpha_v3mu			 = 0.189448 +/- 0.872359
+8: alpha_v4tau			 = 0.061751 +/- 1.67617
+
+9x9 matrix is as follows
+
+     |      0    |      1    |      2    |      3    |      4    |
+----------------------------------------------------------------------
+   0 |          1     -0.1724     -0.7298      0.2261     -0.1335 
+   1 |    -0.1724           1      0.1914     -0.7875    -0.02821 
+   2 |    -0.7298      0.1914           1      -0.448    0.006556 
+   3 |     0.2261     -0.7875      -0.448           1     0.08507 
+   4 |    -0.1335    -0.02821    0.006556     0.08507           1 
+   5 |     0.0046     0.08544     -0.1539    -0.01191      0.1708 
+   6 | -0.0007484     -0.1228    -0.01676      0.1403     0.02294 
+   7 |    0.02373     0.02457    -0.02719    -0.02537       0.326 
+   8 |    0.01569    -0.01611    -0.08458     0.05566     0.06576 
+
+
+     |      5    |      6    |      7    |      8    |
+----------------------------------------------------------------------
+   0 |     0.0046  -0.0007484     0.02373     0.01569 
+   1 |    0.08544     -0.1228     0.02457    -0.01611 
+   2 |    -0.1539    -0.01676    -0.02719    -0.08458 
+   3 |   -0.01191      0.1403    -0.02537     0.05566 
+   4 |     0.1708     0.02294       0.326     0.06576 
+   5 |          1      0.1022    -0.01469     0.01891 
+   6 |     0.1022           1     0.04103   0.0006333 
+   7 |   -0.01469     0.04103           1    0.009828 
+   8 |    0.01891   0.0006333    0.009828           1 
+
+Stopwatch: fit ran in 67.795589 seconds with 24.308583 seconds in prep
+Plot fit variables...
+Info in <TCanvas::Print>: pdf file gen/c1.pdf has been created
