@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 01:16 AM +0100
+// Last Change: Tue Jan 04, 2022 at 02:13 AM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -13,6 +13,7 @@
 #include <RooStats/HistFactory/Sample.h>
 
 #include "cmd.h"
+#include "loader.h"
 
 /////////////
 // Samples //
@@ -20,7 +21,7 @@
 
 // B0 -> D*MuNu (normalization)
 void addMcNorm(const char* ntp, RooStats::HistFactory::Channel& chan,
-               ArgProxy params) {
+               ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_sigmu", "h_sigmu", ntp);
 
   if (params.get<bool>("useMuShapeUncerts")) {
@@ -33,15 +34,15 @@ void addMcNorm(const char* ntp, RooStats::HistFactory::Channel& chan,
 
   sample.SetNormalizeByTheory(kFALSE);
   sample.AddNormFactor("Nmu", params.get<double>("expMu"), 1e-6, 1e6);
-  sample.AddNormFactor("mcNorm_sigmu", params.get<double>("mcNorm_sigMu"), 1e-9,
-                       1.);
+  sample.AddNormFactor("mcNorm_sigmu", addParams.get<double>("mcNorm_sigMu"),
+                       1e-9, 1.);
 
   chan.AddSample(sample);
 }
 
 // B0 -> D*TauNu (signal)
 void addMcSig(const char* ntp, RooStats::HistFactory::Channel& chan,
-              ArgProxy params) {
+              ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_sigtau", "h_sigtau", ntp);
 
   if (params.get<bool>("useTauShapeUncerts")) {
@@ -58,7 +59,7 @@ void addMcSig(const char* ntp, RooStats::HistFactory::Channel& chan,
   sample.SetNormalizeByTheory(kFALSE);
   sample.AddNormFactor("Nmu", params.get<double>("expMu"), 1e-6, 1e6);
   sample.AddNormFactor("RawRDst", params.get<double>("expTau"), 1e-6, 0.2);
-  sample.AddNormFactor("mcNorm_sigtau", params.get<double>("mcNorm_sigTau"),
+  sample.AddNormFactor("mcNorm_sigtau", addParams.get<double>("mcNorm_sigTau"),
                        1e-9, 1.);
 
   chan.AddSample(sample);
@@ -66,7 +67,7 @@ void addMcSig(const char* ntp, RooStats::HistFactory::Channel& chan,
 
 // B0 -> D_1MuNu (D** bkg)
 void addMcD1(const char* ntp, RooStats::HistFactory::Channel& chan,
-             ArgProxy params) {
+             ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_D1", "h_D1", ntp);
 
   if (params.get<bool>("useDststShapeUncerts"))
@@ -84,7 +85,8 @@ void addMcD1(const char* ntp, RooStats::HistFactory::Channel& chan,
   }
 
   sample.SetNormalizeByTheory(kFALSE);
-  sample.AddNormFactor("mcNorm_D1", params.get<double>("mcNorm_D1"), 1e-9, 1.);
+  sample.AddNormFactor("mcNorm_D1", addParams.get<double>("mcNorm_D1"), 1e-9,
+                       1.);
 
   chan.AddSample(sample);
 }
@@ -93,21 +95,23 @@ void addMcD1(const char* ntp, RooStats::HistFactory::Channel& chan,
 // Main //
 //////////
 
-void addMc(const char* ntp, RooStats::HistFactory::Channel& chan,
-           ArgProxy params) {
-  // Define samples to be added here
-  // clang-format off
-  auto samples = std::vector<std::function<void(
-      char* const, RooStats::HistFactory::Channel&, ArgProxy)>&>{
-    addMcNorm,
-    addMcSig,
-    addMcD1
-  };
-  // clang-format on
-
-  for (auto const&& f : samples) {
-    f(ntp, chan, params);
-  }
-}
+/*
+ *void addMc(const char* ntp, RooStats::HistFactory::Channel& chan,
+ *           ArgProxy params) {
+ *  // Define samples to be added here
+ *  // clang-format off
+ *  auto samples = std::vector<std::function<void(
+ *      const char*, RooStats::HistFactory::Channel&, ArgProxy)>&>{
+ *    addMcNorm,
+ *    addMcSig,
+ *    addMcD1
+ *  };
+ *  // clang-format on
+ *
+ *  for (auto const&& f : samples) {
+ *    f(ntp, chan, params);
+ *  }
+ *}
+ */
 
 #endif

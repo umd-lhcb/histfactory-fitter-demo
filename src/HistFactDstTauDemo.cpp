@@ -57,6 +57,7 @@
 
 // HistFactory headers
 
+#include "loader.h"
 #include "cmd.h"
 #include "plot.h"
 #include "fit_samples/mc.h"
@@ -94,6 +95,12 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     *(mcnorms[i]) = 1. / htemp->Integral();
     cout << "mcN_" + mchistos[i] + " = " << 1. / *(mcnorms[i]) << endl;
   }
+
+  // Adding normalization factors
+  Config addParams {};
+  addParams.set("mcNorm_sigMu", mcN_sigmu);
+  addParams.set("mcNorm_sigTau", mcN_sigtau);
+  addParams.set("mcNorm_D1", mcN_D1);
 
   TStopwatch sw, sw2, sw3;
 
@@ -149,69 +156,14 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
   // Now that data is set up, start creating our samples
   // describing the processes to model the data
-  addMc(inputFile.Data(), chan, params);
 
-  //[>********************** B0->D*munu (NORM) ******************************<]
+  addMcNorm(inputFile.Data(), chan, params, addParams);
+  addMcSig(inputFile.Data(), chan, params, addParams);
+  addMcD1(inputFile.Data(), chan, params, addParams);
 
-  //RooStats::HistFactory::Sample sigmu("h_sigmu", "h_sigmu", inputFile.Data());
-  //if (useMuShapeUncerts) {
-    //sigmu.AddHistoSys("v1mu", "h_sigmu_v1m", inputFile.Data(), "",
-                      //"h_sigmu_v1p", inputFile.Data(), "");
-    //sigmu.AddHistoSys("v2mu", "h_sigmu_v2m", inputFile.Data(), "",
-                      //"h_sigmu_v2p", inputFile.Data(), "");
-    //sigmu.AddHistoSys("v3mu", "h_sigmu_v3m", inputFile.Data(), "",
-                      //"h_sigmu_v3p", inputFile.Data(), "");
-  //}
-  //if (BBon3d) sigmu.ActivateStatError();
-  //sigmu.SetNormalizeByTheory(kFALSE);
-  //sigmu.AddNormFactor("Nmu", expMu, 1e-6, 1e6);
-  //sigmu.AddNormFactor("mcNorm_sigmu", mcN_sigmu, 1e-9, 1.);
-  //chan.AddSample(sigmu);
+  //addMc(inputFile.Data(), chan, params);
 
-  /************************* B0->D*taunu (SIGNAL)
-   * *******************************/
-
-  //RooStats::HistFactory::Sample sigtau("h_sigtau", "h_sigtau",
-                                       //inputFile.Data());
-  //if (useTauShapeUncerts) {
-    //sigtau.AddHistoSys("v1mu", "h_sigtau_v1m", inputFile.Data(), "",
-                       //"h_sigtau_v1p", inputFile.Data(), "");
-    //sigtau.AddHistoSys("v2mu", "h_sigtau_v2m", inputFile.Data(), "",
-                       //"h_sigtau_v2p", inputFile.Data(), "");
-    //sigtau.AddHistoSys("v3mu", "h_sigtau_v3m", inputFile.Data(), "",
-                       //"h_sigtau_v3p", inputFile.Data(), "");
-    //sigtau.AddHistoSys("v4tau", "h_sigtau_v4m", inputFile.Data(), "",
-                       //"h_sigtau_v4p", inputFile.Data(), "");
-  //}
-  //if (BBon3d) sigtau.ActivateStatError();
-  //sigtau.SetNormalizeByTheory(kFALSE);
-  //sigtau.AddNormFactor("Nmu", expMu, 1e-6, 1e6);
-  //sigtau.AddNormFactor("RawRDst", expTau, 1e-6, 0.2);
-  //sigtau.AddNormFactor("mcNorm_sigtau", mcN_sigtau, 1e-9, 1.);
-  //chan.AddSample(sigtau);
-
-  //[>************************ B0->D1munu *************************************<]
-
-  //RooStats::HistFactory::Sample d1mu("h_D1", "h_D1", inputFile.Data());
-  //if (BBon3d) d1mu.ActivateStatError();
-  //if (useDststShapeUncerts) {
-    //d1mu.AddHistoSys("IW", "h_D1IWp", inputFile.Data(), "", "h_D1IWm",
-                     //inputFile.Data(), "");
-  //}
-
-  //d1mu.SetNormalizeByTheory(kFALSE);
-  //d1mu.AddNormFactor("mcNorm_D1", mcN_D1, 1e-9, 1.);
-  //if (!constrainDstst) {
-    //d1mu.AddNormFactor("ND1", 1e2, 1e-6, 1e5);
-  //} else {
-    //d1mu.AddNormFactor("NDstst0", 0.102, 1e-6, 1e0);
-    //d1mu.AddNormFactor("Nmu", expMu, 1e-6, 1e6);
-    //d1mu.AddNormFactor("fD1", 3.2, 3.2, 3.2);
-    //d1mu.AddOverallSys("BFD1", 0.9, 1.1);
-  //}
-  //chan.AddSample(d1mu);
-  /*********************** MisID BKG (FROM DATA)
-   * *******************************/
+  /*********************** MisID BKG (FROM DATA)*******************************/
 
   RooStats::HistFactory::Sample misID("h_misID", "h_misID", inputFile.Data());
   // if(BBon3d) misID.ActivateStatError();
