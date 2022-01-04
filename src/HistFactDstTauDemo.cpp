@@ -42,12 +42,11 @@
 ////
 
 #include <any>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <functional>
-#include <iostream>
 
 #include <stdio.h>
 
@@ -59,10 +58,10 @@
 
 // HistFactory headers
 
-#include "loader.h"
 #include "cmd.h"
-#include "plot.h"
 #include "fit_samples/mc.h"
+#include "loader.h"
+#include "plot.h"
 
 #define UNBLIND
 
@@ -85,8 +84,8 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // make each histo normalized to unity. Not totally necessary here, but
   // convenient
 
-  TFile   q(inputFile);
-  TH1 *   htemp;
+  TFile q(inputFile);
+  TH1 * htemp;
 
   TString mchistos[3] = {"sigmu", "sigtau", "D1"};
   double  mcN_sigmu, mcN_sigtau, mcN_D1;
@@ -99,7 +98,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   }
 
   // Adding normalization factors
-  Config addParams {};
+  Config addParams{};
   addParams.set("mcNorm_sigMu", mcN_sigmu);
   addParams.set("mcNorm_sigTau", mcN_sigtau);
   addParams.set("mcNorm_D1", mcN_D1);
@@ -164,7 +163,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   };
   // clang-format on
 
-  for (auto& t : templates) {
+  for (auto &t : templates) {
     t(inputFile.Data(), chan, params, addParams);
   }
 
@@ -403,7 +402,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 int main(int argc, char **argv) {
   // Parser ////////////////////////////////////////////////////////////////////
   cxxopts::Options argOpts("HistFactDstTauDemo",
-                            "a demo R(D*) HistFactory fitter.");
+                           "a demo R(D*) HistFactory fitter.");
 
   // clang-format off
   argOpts.add_options()
@@ -433,7 +432,7 @@ int main(int argc, char **argv) {
   // clang-format on
 
   auto parsedArgs = argOpts.parse(argc, argv);
-  auto mode        = parsedArgs["mode"].as<string>();
+  auto mode       = parsedArgs["mode"].as<string>();
 
   // Define default values for modes
   auto parsedArgsProxy = ArgProxy(parsedArgs, mode);
