@@ -63,8 +63,8 @@
 #include "loader.h"
 #include "plot.h"
 
-#include "fit_samples/mc.h"
 #include "fit_samples/data.h"
+#include "fit_samples/mc.h"
 
 #define UNBLIND
 
@@ -77,11 +77,78 @@ using namespace HistFactory;
 // Fitter setup: Aux //
 ///////////////////////
 
+typedef map<TString, double>         NuParamKeyVal;
+typedef map<TString, vector<double>> NuParamKeyRange;
+
+void setNuisanceParamConst(ModelConfig *mc, vector<TString> params, bool verbose=false) {
+  for (const auto &p : params) {
+    auto nuParam =
+        static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(p));
+    nuParam->setConstant(kTRUE);
+
+    if (verbose) cout << p << " = " << nuParam->getVal() << endl;
+  }
+}
+
+void setNuisanceParamVal(ModelConfig *mc, NuParamKeyVal keyVal) {
+  for (const auto &kv : keyVal) {
+    auto nuParam =
+        static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(kv.first));
+    nuParam->setVal(kv.second);
+    nuParam->setConstant(kTRUE);
+  }
+}
+
+void setNuisanceParamRange(ModelConfig *mc, NuParamKeyRange keyRange) {
+  for (const auto &kv : keyRange) {
+    auto nuParam =
+        static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(kv.first));
+    nuParam->setRange(kv.second[0], kv.second[1]);
+  }
+}
+
+void fixNuisanceParams(ModelConfig *mc) {
+  vector<TString> mcHistos{"sigmu", "sigtau", "D1"};
+  vector<TString> params{};
+  for (auto h : mcHistos) {
+    params.push_back("mcNorm_"+h);
+  }
+
+  setNuisanceParamConst(mc, params, true);
+}
+
+void configNuisanceParams(ModelConfig *mc) {
+  setNuisanceParamVal(mc, NuParamKeyVal{{"NDstst0", 0.102}});
+  setNuisanceParamRange(mc, NuParamKeyRange{{"alpha_BFD1", {-3.0, 3.0}}});
+  setNuisanceParamConst(mc, {"fD1", "NmisID"});
+}
+
+void useDststShapeUncerts(ModelConfig *mc) {
+  setNuisanceParamRange(mc, NuParamKeyRange{{"alpha_IW", {-3.0, 3.0}}});
+}
+
+void useMuShapeUncerts(ModelConfig *mc) {
+  setNuisanceParamRange(mc, NuParamKeyRange{{"alpha_v1mu", {-8.0, 8.0}},
+                                            {"alpha_v2mu", {-8.0, 8.0}},
+                                            {"alpha_v3mu", {-8.0, 8.0}}});
+}
+
+void fixShapes(ModelConfig *mc) {
+  setNuisanceParamVal(mc, {{"alpha_v1mu", 1.06},
+                           {"alpha_v2mu", -0.159},
+                           {"alpha_v3mu", -1.75},
+                           {"alpha_v4tau", 0.0002}});
+}
+
+void fixShapesDstst(ModelConfig *mc) {
+  setNuisanceParamVal(mc, {{"alpha_IW", 0.005 /* -2.187 */}});
+}
+
 ////////////////////////
 // Fitter setup: Main //
 ////////////////////////
 
-void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
+void fit(TString inputFile, TString outputDir, ArgProxy params) {
   // avoid accidental unblinding!
   RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 
@@ -112,28 +179,15 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // Basic fitter settings //
   ///////////////////////////
 
-  TStopwatch sw, sw3;
+  TStopwatch swLoadConfig;
+  swLoadConfig.Reset();
+  swLoadConfig.Start();
 
-  // Many many flags for steering
-  /* STEERING OPTIONS */
-  const bool constrainDstst       = true;
-  const bool useMinos             = true;
-  const bool useMuShapeUncerts    = true;
-  const bool useTauShapeUncerts   = true;
-  const bool useDststShapeUncerts = true;
-  const bool fixshapes            = false;
-  const bool fixshapesdstst       = false;
-  const bool dofit                = true;
-  const bool fitfirst             = false;
-  const bool BBon3d =
-      true;  // flag to enable Barlow-Beeston procedure for all histograms.
-  // Should allow easy comparison of fit errors with and
-  // without the technique. 3d or not is legacy from an old
-  //(3+1)d fit configuration
+  const bool useMinos       = true;
 
   // Set the prefix that will appear before all output for this measurement
-  RooStats::HistFactory::Measurement meas("DstDemo", "DstDemo");
-  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/fit_"));
+  RooStats::HistFactory::Measurement meas("demo", "demo");
+  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/fit"));
   meas.SetExportOnly(kTRUE);  // Tells histfactory to not run the fit and
                               // display results using its own
   meas.SetPOI("RawRDst");
@@ -166,8 +220,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     t(inputFile.Data(), chan, params, addParams);
   }
 
-  sw3.Reset();
-  sw3.Start();
   meas.AddChannel(chan);
   meas.CollectHistograms();
 
@@ -178,106 +230,51 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
 
   // Get model manually
-  auto mc = static_cast<ModelConfig*>(ws->obj("ModelConfig"));
-  auto model = static_cast<RooSimultaneous*>(mc->GetPdf());
+  auto mc    = static_cast<ModelConfig *>(ws->obj("ModelConfig"));
+  auto model = static_cast<RooSimultaneous *>(mc->GetPdf());
 
-  auto theIW = static_cast<PiecewiseInterpolation*>(ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
+  auto theIW = static_cast<PiecewiseInterpolation *>(
+      ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
   theIW->Print("V");
 
-  auto poi = static_cast<RooRealVar*>(
+  auto poi = static_cast<RooRealVar *>(
       mc->GetParametersOfInterest()->createIterator()->Next());
   cout << "Param of Interest: " << poi->GetName() << endl;
 
   // Lets tell roofit the right names for our histogram variables //
-  auto obs = static_cast<const RooArgSet*>(mc->GetObservables());
+  auto obs = static_cast<const RooArgSet *>(mc->GetObservables());
 
-  auto x = static_cast<RooRealVar*>(obs->find("obs_x_Dstmu_kinematic"));
+  auto x = static_cast<RooRealVar *>(obs->find("obs_x_Dstmu_kinematic"));
   x->SetTitle("m^{2}_{miss}");
   x->setUnit("GeV^{2}");
 
-  auto y = static_cast<RooRealVar*>(obs->find("obs_y_Dstmu_kinematic"));
+  auto y = static_cast<RooRealVar *>(obs->find("obs_y_Dstmu_kinematic"));
   y->SetTitle("E_{#mu}");
   y->setUnit("MeV");
 
-  auto z = static_cast<RooRealVar*>(obs->find("obs_z_Dstmu_kinematic"));
+  auto z = static_cast<RooRealVar *>(obs->find("obs_z_Dstmu_kinematic"));
   z->SetTitle("q^{2}");
   z->setUnit("MeV^{2}");
 
-  RooAbsData * data = (RooAbsData *)ws->data("obsData");
+  // Nuisance parameter config
+  fixNuisanceParams(mc);
+  configNuisanceParams(mc);
 
-  /* FIX SOME MODEL PARAMS */
-  for (int i = 0; i < 3; i++) {
-    if (((RooRealVar *)(mc->GetNuisanceParameters()->find(
-            "mcNorm_" + mchistos[i]))) != NULL) {
-      ((RooRealVar *)(mc->GetNuisanceParameters()->find("mcNorm_" +
-                                                        mchistos[i])))
-          ->setConstant(kTRUE);
-      cout << "mcNorm_" + mchistos[i] + " = "
-           << ((RooRealVar *)(mc->GetNuisanceParameters()->find("mcNorm_" +
-                                                                mchistos[i])))
-                  ->getVal()
-           << endl;
-    }
-  }
+  // Looks like shape uncertainties and fix shapes should NOT be enabled at the
+  // same time
+  if (params.get<bool>("useDststShapeUncerts")) useDststShapeUncerts(mc);
+  if (params.get<bool>("useMuShapeUncerts")) useMuShapeUncerts(mc);
 
-  ((RooRealVar *)(mc->GetNuisanceParameters()->find("NDstst0")))->setVal(0.102);
-  ((RooRealVar *)(mc->GetNuisanceParameters()->find("NDstst0")))
-      ->setConstant(kTRUE);
-  ((RooRealVar *)(mc->GetNuisanceParameters()->find("fD1")))
-      ->setConstant(kTRUE);
-  ((RooRealVar *)(mc->GetNuisanceParameters()->find("NmisID")))
-      ->setConstant(kTRUE);
-
-  if (useDststShapeUncerts)
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_IW")))
-        ->setRange(-3.0, 3.0);
-  if (useMuShapeUncerts)
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v1mu")))
-        ->setRange(-8, 8);
-  if (useMuShapeUncerts)
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v2mu")))
-        ->setRange(-8, 8);
-  if (useMuShapeUncerts)
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v3mu")))
-        ->setRange(-8, 8);
-  ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_BFD1")))
-      ->setRange(-3, 3);
-
-  if (fixshapes) {
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v1mu")))
-        ->setVal(1.06);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v1mu")))
-        ->setConstant(kTRUE);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v2mu")))
-        ->setVal(-0.159);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v2mu")))
-        ->setConstant(kTRUE);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v3mu")))
-        ->setVal(-1.75);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v3mu")))
-        ->setConstant(kTRUE);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v4tau")))
-        ->setVal(0.0002);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_v4tau")))
-        ->setConstant(kTRUE);
-  }
-  if (fixshapesdstst) {
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_IW")))
-        ->setVal(-0.005);  //-2.187);
-    ((RooRealVar *)(mc->GetNuisanceParameters()->find("alpha_IW")))
-        ->setConstant(kTRUE);
-  }
+  if (params.get<bool>("fixShapes")) fixShapes(mc);
+  if (params.get<bool>("fixShapesDstst")) fixShapesDstst(mc);
 
   // This switches the model to a class written to handle analytic
   // Barlow-Beeston lite. Otherwise, every bin gets a minuit variable to
-  // minimize over! This class, on the other hand, allows a likelihood where the
-  // bin parameters are analytically minimized at each step
+  // minimize over!  This class, on the other hand, allows a likelihood where
+  // the bin parameters are analytically minimized at each step
   HistFactorySimultaneous *model_hf = new HistFactorySimultaneous(*model);
-
-  RooFitResult *toyresult;
-  RooAbsReal *  nll_hf;
-
-  RooFitResult *result, *result2;
+  RooAbsReal *             nll_hf;
+  RooFitResult *           result;
 
   cerr << "Saving PDF snapshot" << endl;
   RooArgSet *allpars;
@@ -293,37 +290,40 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   RooArgSet *theVars = (RooArgSet *)allpars->Clone();
   theVars->add(poierror);
 
-  if (dofit) {  // return;
-    nll_hf = model_hf->createNLL(*data, Offset(kTRUE));
+  auto data = static_cast<RooAbsData *>(ws->data("obsData"));
 
-    RooMinuit *minuit_hf = new RooMinuit(*nll_hf);
-    // minuit_hf->setVerbose(kTRUE);
-    RooArgSet *temp = new RooArgSet();
-    nll_hf->getParameters(temp)->Print("V");
-    cout << "******************************************************************"
-            "****"
-         << endl;
-    minuit_hf->setErrorLevel(0.5);
+  nll_hf = model_hf->createNLL(*data, Offset(kTRUE));
+
+  RooMinuit *minuit_hf = new RooMinuit(*nll_hf);
+  RooArgSet *temp      = new RooArgSet();
+  nll_hf->getParameters(temp)->Print("V");
+  minuit_hf->setErrorLevel(0.5);
 #ifndef UNBLIND
-    minuit_hf->setPrintLevel(-1);
+  minuit_hf->setPrintLevel(-1);
 #endif
 
-    std::cout << "Minimizing the Minuit (Migrad)" << std::endl;
+  ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
+  swLoadConfig.Stop();
 
-    ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
+  cout << "******************************************************************"
+       << endl;
 
-    sw3.Stop();
-    sw.Reset();
-    sw.Start();
-    minuit_hf->setStrategy(2);
-    minuit_hf->fit("smh");
-    RooFitResult *tempResult = minuit_hf->save("TempResult", "TempResult");
+  ////////////
+  // Do fit //
+  ////////////
 
-    cout << tempResult->edm() << endl;
-    if (useMinos) minuit_hf->minos(RooArgSet(*poi));
-    sw.Stop();
-    result = minuit_hf->save("Result", "Result");
-  }
+  cout << "Minimizing the Minuit (Migrad)" << endl;
+  TStopwatch sw;
+  sw.Reset();
+  sw.Start();
+  minuit_hf->setStrategy(2);
+  minuit_hf->fit("smh");
+  RooFitResult *tempResult = minuit_hf->save("TempResult", "TempResult");
+
+  cout << tempResult->edm() << endl;
+  if (useMinos) minuit_hf->minos(RooArgSet(*poi));
+  sw.Stop();
+  result = minuit_hf->save("Result", "Result");
 
   if (result != NULL) {
     printf("Fit ran with status %d\n", result->status());
@@ -358,9 +358,8 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
     result->correlationMatrix().Print();
 
-    if (dofit)
-      printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
-             sw.RealTime(), sw3.RealTime());
+    printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
+           sw.RealTime(), swLoadConfig.RealTime());
   }
 
   ///////////
@@ -372,7 +371,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   cout << "Plot fit variables..." << endl;
   // For simultaneous fits, this is the category histfactory uses to sort the
   // channels
-  auto idx  = static_cast<RooCategory*>(obs->find("channelCat"));
+  auto idx = static_cast<RooCategory *>(obs->find("channelCat"));
   auto fitVarFrames =
       plotC1(std::vector<RooRealVar *>{x, y, z},
              {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, model_hf, idx);
@@ -387,7 +386,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 //////////
 
 int main(int argc, char **argv) {
-  // Parser ////////////////////////////////////////////////////////////////////
   cxxopts::Options argOpts("histfact_demo", "a demo R(D*) HistFactory fitter.");
 
   // clang-format off
@@ -407,8 +405,6 @@ int main(int argc, char **argv) {
     ("fixShapes", "?")
     ("fixShapesDstst", "?")
     ("bbOn3D", "enable Barlow-Beeston procedure for all histograms")
-    ////
-    ("doFit", "perform a fit")
     ////
     // ISOLATED FULL RANGE NONN (huh?)
     ("expTau", "?", cxxopts::value<double>()
@@ -434,8 +430,7 @@ int main(int argc, char **argv) {
     {"useDststShapeUncerts", true},
     {"fixShapes", false},
     {"fixShapesDstst", false},
-    {"bbOn3D", true},
-    {"doFit", true},
+    {"bbOn3D", true}
   });
   // clang-format on
 
@@ -447,7 +442,7 @@ int main(int argc, char **argv) {
   auto inputFile = TString(parsedArgs["inputFile"].as<string>());
   auto outputDir = TString(parsedArgs["outputDir"].as<string>());
 
-  HistFactDstTauDemo(inputFile, outputDir, parsedArgsProxy);
+  fit(inputFile, outputDir, parsedArgsProxy);
 
   return 0;
 }
