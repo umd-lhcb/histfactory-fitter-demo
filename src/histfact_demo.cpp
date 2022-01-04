@@ -112,7 +112,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // Basic fitter settings //
   ///////////////////////////
 
-  TStopwatch sw, sw2, sw3;
+  TStopwatch sw, sw3;
 
   // Many many flags for steering
   /* STEERING OPTIONS */
@@ -171,40 +171,39 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   meas.AddChannel(chan);
   meas.CollectHistograms();
 
-  ////
+  ///////////////////////////
+  // Change fit parameters //
+  ///////////////////////////
 
-  RooWorkspace *w;
-  w = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
+  auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
 
-  ModelConfig *mc = (ModelConfig *)w->obj("ModelConfig");  // Get model manually
-  RooSimultaneous *model = (RooSimultaneous *)mc->GetPdf();
+  // Get model manually
+  auto mc = static_cast<ModelConfig*>(ws->obj("ModelConfig"));
+  auto model = static_cast<RooSimultaneous*>(mc->GetPdf());
 
-  PiecewiseInterpolation *theIW =
-      (PiecewiseInterpolation *)w->obj("h_D1_Dstmu_kinematic_Hist_alpha");
-  // theIW->disableCache(kTRUE);
+  auto theIW = static_cast<PiecewiseInterpolation*>(ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
   theIW->Print("V");
 
-  RooRealVar *poi =
-      (RooRealVar *)mc->GetParametersOfInterest()->createIterator()->Next();
-  std::cout << "Param of Interest: " << poi->GetName() << std::endl;
+  auto poi = static_cast<RooRealVar*>(
+      mc->GetParametersOfInterest()->createIterator()->Next());
+  cout << "Param of Interest: " << poi->GetName() << endl;
 
   // Lets tell roofit the right names for our histogram variables //
-  RooArgSet * obs = (RooArgSet *)mc->GetObservables();
-  RooRealVar *x   = (RooRealVar *)obs->find("obs_x_Dstmu_kinematic");
-  RooRealVar *y   = (RooRealVar *)obs->find("obs_y_Dstmu_kinematic");
-  RooRealVar *z   = (RooRealVar *)obs->find("obs_z_Dstmu_kinematic");
+  auto obs = static_cast<const RooArgSet*>(mc->GetObservables());
+
+  auto x = static_cast<RooRealVar*>(obs->find("obs_x_Dstmu_kinematic"));
   x->SetTitle("m^{2}_{miss}");
   x->setUnit("GeV^{2}");
+
+  auto y = static_cast<RooRealVar*>(obs->find("obs_y_Dstmu_kinematic"));
   y->SetTitle("E_{#mu}");
   y->setUnit("MeV");
+
+  auto z = static_cast<RooRealVar*>(obs->find("obs_z_Dstmu_kinematic"));
   z->SetTitle("q^{2}");
   z->setUnit("MeV^{2}");
 
-  // For simultaneous fits, this is the category histfactory uses to sort the
-  // channels
-
-  RooCategory *idx  = (RooCategory *)obs->find("channelCat");
-  RooAbsData * data = (RooAbsData *)w->data("obsData");
+  RooAbsData * data = (RooAbsData *)ws->data("obsData");
 
   /* FIX SOME MODEL PARAMS */
   for (int i = 0; i < 3; i++) {
@@ -287,7 +286,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   RooArgSet *constraints;
   constraints = (RooArgSet *)mc->GetConstraintParameters();
   if (constraints != NULL) allpars->add(*constraints);
-  w->saveSnapshot("TMCPARS", *allpars, kTRUE);
+  ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
   RooRealVar poierror("poierror", "poierror", 0.00001, 0.010);
   TIterator *iter = allpars->createIterator();
   RooAbsArg *tempvar;
@@ -311,7 +310,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
     std::cout << "Minimizing the Minuit (Migrad)" << std::endl;
 
-    w->saveSnapshot("TMCPARS", *allpars, kTRUE);
+    ws->saveSnapshot("TMCPARS", *allpars, kTRUE);
 
     sw3.Stop();
     sw.Reset();
@@ -336,7 +335,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     result->floatParsInit().Print();
 
     cout << "CURRENT NUISANCE PARAMETERS:" << endl;
-    // TIterator *paramiter = mc->GetNuisanceParameters()->createIterator();
     TIterator * paramiter         = result->floatParsFinal().createIterator();
     RooRealVar *__temp            = (RooRealVar *)paramiter->Next();
     int         final_par_counter = 0;
@@ -371,8 +369,10 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
   setGlobalPlotStyle();
 
-  // Plot fit variables
   cout << "Plot fit variables..." << endl;
+  // For simultaneous fits, this is the category histfactory uses to sort the
+  // channels
+  auto idx  = static_cast<RooCategory*>(obs->find("channelCat"));
   auto fitVarFrames =
       plotC1(std::vector<RooRealVar *>{x, y, z},
              {"m^{2}_{miss}", "E_{#mu}", "q^{2}"}, data, model_hf, idx);
