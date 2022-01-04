@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 06:55 PM +0100
+// Last Change: Tue Jan 04, 2022 at 07:19 PM +0100
 
 #include <any>
 #include <functional>
@@ -177,7 +177,7 @@ void fit(TString inputFile, ArgProxy params) {
   // Load fit templates //
   ////////////////////////
   // clang-format off
-  vector<function<void(const char*, Channel&, ArgProxy, Config)> > templates {
+  vector<function<void(const char*, Channel&, ArgProxy, Config)>> templates{
     // Data
     addData, addMisId,
     // MC
@@ -185,9 +185,7 @@ void fit(TString inputFile, ArgProxy params) {
   };
   // clang-format on
 
-  for (auto &t : templates) {
-    t(inputFile.Data(), chan, params, addParams);
-  }
+  for (auto &t : templates) t(inputFile.Data(), chan, params, addParams);
 
   meas.AddChannel(chan);
   meas.CollectHistograms();
