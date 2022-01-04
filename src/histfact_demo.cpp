@@ -1,45 +1,6 @@
-
-#include "TDatime.h"
-#include "TH3.h"
-#include "TIterator.h"
-#include "TRandom3.h"
-#include "TStopwatch.h"
-
-#include "RooAbsData.h"
-#include "RooCategory.h"
-#include "RooChi2Var.h"
-#include "RooDataHist.h"
-#include "RooDataSet.h"
-#include "RooExtendPdf.h"
-#include "RooFitResult.h"
-#include "RooFormulaVar.h"
-#include "RooGaussian.h"
-#include "RooHist.h"
-#include "RooHistPdf.h"
-#include "RooMCStudy.h"
-#include "RooMinuit.h"
-#include "RooMsgService.h"
-#include "RooParamHistFunc.h"
-#include "RooPoisson.h"
-#include "RooRandom.h"
-#include "RooRealSumPdf.h"
-#include "RooRealVar.h"
-#include "RooSimultaneous.h"
-
-#include "RooStats/MinNLLTestStat.h"
-#include "RooStats/ModelConfig.h"
-#include "RooStats/ToyMCSampler.h"
-
-#include "RooStats/HistFactory/Channel.h"
-#include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include "RooStats/HistFactory/HistFactoryModelUtils.h"
-#include "RooStats/HistFactory/HistFactorySimultaneous.h"
-#include "RooStats/HistFactory/MakeModelAndMeasurementsFast.h"
-#include "RooStats/HistFactory/Measurement.h"
-#include "RooStats/HistFactory/ParamHistFunc.h"
-#include "RooStats/HistFactory/PiecewiseInterpolation.h"
-#include "RooStats/HistFactory/RooBarlowBeestonLL.h"
-////
+// Author: Phoebe Hamilton, Yipeng Sun
+// License: BSD 2-clause
+// Last Change: Tue Jan 04, 2022 at 06:55 PM +0100
 
 #include <any>
 #include <functional>
@@ -54,9 +15,16 @@
 #include <cxxopts.hpp>
 
 // Basic ROOT headers
+#include <TStopwatch.h>
 #include <TString.h>
 
 // HistFactory headers
+#include <RooFitResult.h>
+#include <RooMinuit.h>
+
+#include <RooStats/HistFactory/MakeModelAndMeasurementsFast.h>
+#include <RooStats/HistFactory/PiecewiseInterpolation.h>
+#include <RooStats/ModelConfig.h>
 
 // Project headers
 #include "cmd.h"
@@ -149,7 +117,7 @@ void fixShapesDstst(ModelConfig *mc) {
 // Fitter setup: Main //
 ////////////////////////
 
-void fit(TString inputFile, TString outputDir, ArgProxy params) {
+void fit(TString inputFile, ArgProxy params) {
   // avoid accidental unblinding!
   RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 
@@ -179,6 +147,8 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   ///////////////////////
   // Initialize fitter //
   ///////////////////////
+
+  auto outputDir = TString(params.get<string>("outputDir"));
 
   TStopwatch swPrep;
   swPrep.Reset();
@@ -327,34 +297,32 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
 
   swFit.Stop();
 
-  if (result != nullptr) {
-    printf("Fit ran with status %d\n", result->status());
-    printf("Stat error on R(D*) is %f\n", poi->getError());
-    printf("EDM at end was %f\n", result->edm());
-    result->floatParsInit().Print();
+  printf("Fit ran with status %d\n", result->status());
+  printf("Stat error on R(D*) is %f\n", poi->getError());
+  printf("EDM at end was %f\n", result->edm());
+  result->floatParsInit().Print();
 
-    cout << "CURRENT NUISANCE PARAMETERS:" << endl;
-    auto       paramIter = result->floatParsFinal().createIterator();
-    RooAbsArg *paramItem;
-    int        finalParamCounter = 0;
+  cout << "CURRENT NUISANCE PARAMETERS:" << endl;
+  auto       paramIter = result->floatParsFinal().createIterator();
+  RooAbsArg *paramItem;
+  int        finalParamCounter = 0;
 
-    while ((paramItem = static_cast<RooAbsArg *>(paramIter->Next()))) {
-      if (!paramItem->isConstant()) {
-        if (!(TString(paramItem->GetName()).EqualTo(poi->GetName()))) {
-          auto paramVal = static_cast<RooRealVar *>(
-              result->floatParsFinal().find(paramItem->GetName()));
-          cout << finalParamCounter << ": " << paramItem->GetName()
-               << "\t\t\t = " << paramVal->getVal() << " +/- "
-               << paramVal->getError() << endl;
-        }
+  while ((paramItem = static_cast<RooAbsArg *>(paramIter->Next()))) {
+    if (!paramItem->isConstant()) {
+      if (!(TString(paramItem->GetName()).EqualTo(poi->GetName()))) {
+        auto paramVal = static_cast<RooRealVar *>(
+            result->floatParsFinal().find(paramItem->GetName()));
+        cout << finalParamCounter << ": " << paramItem->GetName()
+             << "\t\t\t = " << paramVal->getVal() << " +/- "
+             << paramVal->getError() << endl;
       }
-      finalParamCounter++;
     }
-
-    result->correlationMatrix().Print();
-    printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
-           swFit.RealTime(), swPrep.RealTime());
+    finalParamCounter++;
   }
+
+  result->correlationMatrix().Print();
+  printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
+         swFit.RealTime(), swPrep.RealTime());
 
   ///////////
   // Plots //
@@ -434,9 +402,7 @@ int main(int argc, char **argv) {
   }
 
   auto inputFile = TString(parsedArgs["inputFile"].as<string>());
-  auto outputDir = TString(parsedArgs["outputDir"].as<string>());
-
-  fit(inputFile, outputDir, parsedArgsProxy);
+  fit(inputFile, parsedArgsProxy);
 
   return 0;
 }
