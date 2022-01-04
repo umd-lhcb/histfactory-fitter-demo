@@ -47,10 +47,14 @@
 ////
 
 #include <any>
-#include <cxxopts.hpp>
 #include <iostream>
 #include <map>
 #include <string>
+#include <vector>
+#include <functional>
+
+// Third-party headers
+#include <cxxopts.hpp>
 
 // Basic ROOT headers
 #include <TString.h>
@@ -124,7 +128,7 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // Set the prefix that will appear before
   // all output for this measurement
   RooStats::HistFactory::Measurement meas("DstDemo", "DstDemo");
-  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output"));
+  meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/"));
   meas.SetExportOnly(kTRUE);  // Tells histfactory to not run the fit and
                               // display results using its own
 
@@ -138,7 +142,6 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // actually, now this is only used for the misID
   meas.SetLumi(1.0);
   meas.SetLumiRelErr(0.05);
-
   /******* Fit starting constants ***********/
 
   // ISOLATED FULL RANGE NONN
@@ -154,14 +157,22 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // tell histfactory what data to use
   chan.SetData("h_data", inputFile.Data());
 
-  // Now that data is set up, start creating our samples
-  // describing the processes to model the data
+  // Load fit templates
+  // clang-format off
+  vector<function<void(const char*, Channel&, ArgProxy, Config)> > templates {
+    // Data
+    // MC
+    addMcNorm, addMcSig, addMcD1
+  };
+  // clang-format on
 
-  addMcNorm(inputFile.Data(), chan, params, addParams);
-  addMcSig(inputFile.Data(), chan, params, addParams);
-  addMcD1(inputFile.Data(), chan, params, addParams);
+  for (auto& t : templates) {
+    t(inputFile.Data(), chan, params, addParams);
+  }
 
-  //addMc(inputFile.Data(), chan, params);
+  //addMcNorm(inputFile.Data(), chan, params, addParams);
+  //addMcSig(inputFile.Data(), chan, params, addParams);
+  //addMcD1(inputFile.Data(), chan, params, addParams);
 
   /*********************** MisID BKG (FROM DATA)*******************************/
 
@@ -397,11 +408,11 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
 
 int main(int argc, char **argv) {
   // Parser ////////////////////////////////////////////////////////////////////
-  cxxopts::Options argparse("HistFactDstTauDemo",
+  cxxopts::Options argOpts("HistFactDstTauDemo",
                             "a demo R(D*) HistFactory fitter.");
 
   // clang-format off
-  argparse.add_options()
+  argOpts.add_options()
     ("h,help", "print usage")
     ("i,inputFile", "input fit templates", cxxopts::value<string>())
     ("o,outputDir", "output directory", cxxopts::value<string>())
@@ -427,7 +438,7 @@ int main(int argc, char **argv) {
     ;
   // clang-format on
 
-  auto parsedArgs = argparse.parse(argc, argv);
+  auto parsedArgs = argOpts.parse(argc, argv);
   auto mode        = parsedArgs["mode"].as<string>();
 
   // Define default values for modes
@@ -443,13 +454,11 @@ int main(int argc, char **argv) {
     {"fixShapesDstst", false},
     {"bbOn3D", true},
     {"doFit", true},
-    {"doToyMC", false},
-    {"fitFirst", false},
   });
   // clang-format on
 
   if (parsedArgs.count("help")) {
-    cout << argparse.help() << endl;
+    cout << argOpts.help() << endl;
     exit(0);
   }
 

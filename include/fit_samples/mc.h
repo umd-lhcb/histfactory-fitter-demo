@@ -1,12 +1,9 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 02:13 AM +0100
+// Last Change: Tue Jan 04, 2022 at 03:48 AM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
-
-#include <functional>
-#include <vector>
 
 #include <RooStats/HistFactory/Channel.h>
 #include <RooStats/HistFactory/Measurement.h>
@@ -18,6 +15,7 @@
 /////////////
 // Samples //
 /////////////
+// MC samples to model the data
 
 // B0 -> D*MuNu (normalization)
 void addMcNorm(const char* ntp, RooStats::HistFactory::Channel& chan,
@@ -90,28 +88,5 @@ void addMcD1(const char* ntp, RooStats::HistFactory::Channel& chan,
 
   chan.AddSample(sample);
 }
-
-//////////
-// Main //
-//////////
-
-/*
- *void addMc(const char* ntp, RooStats::HistFactory::Channel& chan,
- *           ArgProxy params) {
- *  // Define samples to be added here
- *  // clang-format off
- *  auto samples = std::vector<std::function<void(
- *      const char*, RooStats::HistFactory::Channel&, ArgProxy)>&>{
- *    addMcNorm,
- *    addMcSig,
- *    addMcD1
- *  };
- *  // clang-format on
- *
- *  for (auto const&& f : samples) {
- *    f(ntp, chan, params);
- *  }
- *}
- */
 
 #endif
