@@ -184,8 +184,6 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   swPrep.Reset();
   swPrep.Start();
 
-  const bool useMinos = true;
-
   // Set the prefix that will appear before all output for this measurement
   RooStats::HistFactory::Measurement meas("demo", "demo");
   meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/fit"));
@@ -307,13 +305,11 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
   ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
   swPrep.Stop();
 
-  cout << "********************************************************************"
-       << endl;
-
   ////////////
   // Do fit //
   ////////////
 
+  cout << "==============================" << endl;
   cout << "Minimizing the Minuit (Migrad)" << endl;
 
   TStopwatch swFit;
@@ -322,10 +318,11 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
 
   minuitHf->setStrategy(2);
   minuitHf->fit("smh");
-  RooFitResult *tempResult = minuitHf->save("TempResult", "TempResult");
 
+  auto tempResult = minuitHf->save("TempResult", "TempResult");
   cout << tempResult->edm() << endl;
-  if (useMinos) minuitHf->minos(RooArgSet(*poi));
+
+  if (params.get<bool>("useMinos")) minuitHf->minos(RooArgSet(*poi));
   auto result = minuitHf->save("Result", "Result");
 
   swFit.Stop();
@@ -334,33 +331,27 @@ void fit(TString inputFile, TString outputDir, ArgProxy params) {
     printf("Fit ran with status %d\n", result->status());
     printf("Stat error on R(D*) is %f\n", poi->getError());
     printf("EDM at end was %f\n", result->edm());
-
     result->floatParsInit().Print();
 
     cout << "CURRENT NUISANCE PARAMETERS:" << endl;
-    TIterator * paramiter         = result->floatParsFinal().createIterator();
-    RooRealVar *__temp            = (RooRealVar *)paramiter->Next();
-    int         final_par_counter = 0;
-    while (__temp != NULL) {
-      if (!__temp->isConstant()) {
-        if (!(TString(__temp->GetName()).EqualTo(poi->GetName()))) {
-          cout << final_par_counter << ": " << __temp->GetName() << "\t\t\t = "
-               << ((RooRealVar *)result->floatParsFinal().find(
-                       __temp->GetName()))
-                      ->getVal()
-               << " +/- "
-               << ((RooRealVar *)result->floatParsFinal().find(
-                       __temp->GetName()))
-                      ->getError()
-               << endl;
+    auto       paramIter = result->floatParsFinal().createIterator();
+    RooAbsArg *paramItem;
+    int        finalParamCounter = 0;
+
+    while ((paramItem = static_cast<RooAbsArg *>(paramIter->Next()))) {
+      if (!paramItem->isConstant()) {
+        if (!(TString(paramItem->GetName()).EqualTo(poi->GetName()))) {
+          auto paramVal = static_cast<RooRealVar *>(
+              result->floatParsFinal().find(paramItem->GetName()));
+          cout << finalParamCounter << ": " << paramItem->GetName()
+               << "\t\t\t = " << paramVal->getVal() << " +/- "
+               << paramVal->getError() << endl;
         }
       }
-      final_par_counter++;
-      __temp = (RooRealVar *)paramiter->Next();
+      finalParamCounter++;
     }
 
     result->correlationMatrix().Print();
-
     printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
            swFit.RealTime(), swPrep.RealTime());
   }
@@ -400,21 +391,21 @@ int main(int argc, char **argv) {
      ->default_value("fullFit"))
     ////
     ("constrainDstst", "constrain D** normalization")
-    ("useMinos", "?")
     ("useMuShapeUncerts", "constrain normalization shape")
     ("useTauShapeUncerts", "constrain signal shape")
     ("useDststShapeUncerts", "constrain D** shape")
-    ////
     ("fixShapes", "?")
     ("fixShapesDstst", "?")
-    ("bbOn3D", "enable Barlow-Beeston procedure for all histograms")
+    ////
+    ("useMinos", "?")
+    ("bbOn3D", "enable Barlow-Beeston procedure for all histograms (legacy)")
     ////
     // ISOLATED FULL RANGE NONN (huh?)
     ("expTau", "?", cxxopts::value<double>()
      ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
     ("expMu", "?", cxxopts::value<double>()
      ->default_value("50e3"))
-    ("relLumi", "real luminosity", cxxopts::value<double>()
+    ("relLumi", "set real luminosity", cxxopts::value<double>()
      ->default_value("1.0"))
     ;
   // clang-format on
@@ -427,19 +418,19 @@ int main(int argc, char **argv) {
   // clang-format off
   parsedArgsProxy.set_default("fullFit", map<string, any>{
     {"constrainDstst", true},
-    {"useMinos", true},
     {"useMuShapeUncerts", true},
     {"useTauShapeUncerts", true},
     {"useDststShapeUncerts", true},
     {"fixShapes", false},
     {"fixShapesDstst", false},
+    {"useMinos", true},
     {"bbOn3D", true}
   });
   // clang-format on
 
   if (parsedArgs.count("help")) {
     cout << argOpts.help() << endl;
-    exit(0);
+    return 0;
   }
 
   auto inputFile = TString(parsedArgs["inputFile"].as<string>());
