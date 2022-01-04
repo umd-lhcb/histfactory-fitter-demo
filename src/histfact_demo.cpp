@@ -58,10 +58,13 @@
 
 // HistFactory headers
 
+// Project headers
 #include "cmd.h"
-#include "fit_samples/mc.h"
 #include "loader.h"
 #include "plot.h"
+
+#include "fit_samples/mc.h"
+#include "fit_samples/data.h"
 
 #define UNBLIND
 
@@ -70,11 +73,13 @@ using namespace RooFit;
 using namespace RooStats;
 using namespace HistFactory;
 
-/////////////
-// Helpers //
-/////////////
+///////////////////////
+// Fitter setup: Aux //
+///////////////////////
 
-unique_ptr<TDatime> get_date() { return make_unique<TDatime>(); }
+////////////////////////
+// Fitter setup: Main //
+////////////////////////
 
 void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // avoid accidental unblinding!
@@ -103,6 +108,10 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   addParams.set("mcNorm_sigTau", mcN_sigtau);
   addParams.set("mcNorm_D1", mcN_D1);
 
+  ///////////////////////////
+  // Basic fitter settings //
+  ///////////////////////////
+
   TStopwatch sw, sw2, sw3;
 
   // Many many flags for steering
@@ -122,42 +131,32 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
   // without the technique. 3d or not is legacy from an old
   //(3+1)d fit configuration
 
-  // Set the prefix that will appear before
-  // all output for this measurement
+  // Set the prefix that will appear before all output for this measurement
   RooStats::HistFactory::Measurement meas("DstDemo", "DstDemo");
   meas.SetOutputFilePrefix(static_cast<string>(outputDir + "/fit_output/fit_"));
   meas.SetExportOnly(kTRUE);  // Tells histfactory to not run the fit and
                               // display results using its own
-
   meas.SetPOI("RawRDst");
 
   // set the lumi for the measurement.
   // only matters for the data-driven pdfs the way I've set it up.
   // in invfb variable rellumi gives the relative luminosity between the
   // data used to generate the pdfs and the sample we are fitting
-
+  //
   // actually, now this is only used for the misID
-  meas.SetLumi(1.0);
+  meas.SetLumi(params.get<double>("relLumi"));
   meas.SetLumiRelErr(0.05);
-  /******* Fit starting constants ***********/
-
-  // ISOLATED FULL RANGE NONN
-  //*
-  const double expTau = 0.252 * 0.1742 * 0.781 / 0.85;
-  double       expMu  = 50e3;
-
-  double RelLumi = 1.00;
 
   RooStats::HistFactory::Channel chan("Dstmu_kinematic");
   chan.SetStatErrorConfig(1e-5, "Poisson");
 
-  // tell histfactory what data to use
-  chan.SetData("h_data", inputFile.Data());
-
-  // Load fit templates
+  ////////////////////////
+  // Load fit templates //
+  ////////////////////////
   // clang-format off
   vector<function<void(const char*, Channel&, ArgProxy, Config)> > templates {
     // Data
+    addData, addMisId,
     // MC
     addMcNorm, addMcSig, addMcD1
   };
@@ -167,21 +166,9 @@ void HistFactDstTauDemo(TString inputFile, TString outputDir, ArgProxy params) {
     t(inputFile.Data(), chan, params, addParams);
   }
 
-  /*********************** MisID BKG (FROM DATA)*******************************/
-
-  RooStats::HistFactory::Sample misID("h_misID", "h_misID", inputFile.Data());
-  // if(BBon3d) misID.ActivateStatError();
-
-  misID.SetNormalizeByTheory(kTRUE);
-  misID.AddNormFactor("NmisID", RelLumi, 1e-6, 1e5);
-  chan.AddSample(misID);
-
-  /****** END SAMPLE CHANNELS *******/
-
   sw3.Reset();
   sw3.Start();
   meas.AddChannel(chan);
-
   meas.CollectHistograms();
 
   ////
@@ -423,10 +410,13 @@ int main(int argc, char **argv) {
     ////
     ("doFit", "perform a fit")
     ////
+    // ISOLATED FULL RANGE NONN (huh?)
     ("expTau", "?", cxxopts::value<double>()
      ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
     ("expMu", "?", cxxopts::value<double>()
      ->default_value("50e3"))
+    ("relLumi", "real luminosity", cxxopts::value<double>()
+     ->default_value("1.0"))
     ;
   // clang-format on
 
