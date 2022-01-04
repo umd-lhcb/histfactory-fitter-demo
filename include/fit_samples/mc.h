@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jul 12, 2021 at 03:03 AM +0200
+// Last Change: Tue Jan 04, 2022 at 01:16 AM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -19,8 +19,8 @@
 /////////////
 
 // B0 -> D*MuNu (normalization)
-void add_mc_norm(char* const ntp, RooStats::HistFactory::Channel& chan,
-                 ArgProxy params) {
+void addMcNorm(const char* ntp, RooStats::HistFactory::Channel& chan,
+               ArgProxy params) {
   RooStats::HistFactory::Sample sample("h_sigmu", "h_sigmu", ntp);
 
   if (params.get<bool>("useMuShapeUncerts")) {
@@ -40,8 +40,8 @@ void add_mc_norm(char* const ntp, RooStats::HistFactory::Channel& chan,
 }
 
 // B0 -> D*TauNu (signal)
-void add_mc_sig(char* const ntp, RooStats::HistFactory::Channel& chan,
-                ArgProxy params) {
+void addMcSig(const char* ntp, RooStats::HistFactory::Channel& chan,
+              ArgProxy params) {
   RooStats::HistFactory::Sample sample("h_sigtau", "h_sigtau", ntp);
 
   if (params.get<bool>("useTauShapeUncerts")) {
@@ -65,8 +65,8 @@ void add_mc_sig(char* const ntp, RooStats::HistFactory::Channel& chan,
 }
 
 // B0 -> D_1MuNu (D** bkg)
-void add_mc_d_1(char* const ntp, RooStats::HistFactory::Channel& chan,
-                ArgProxy params) {
+void addMcD1(const char* ntp, RooStats::HistFactory::Channel& chan,
+             ArgProxy params) {
   RooStats::HistFactory::Sample sample("h_D1", "h_D1", ntp);
 
   if (params.get<bool>("useDststShapeUncerts"))
@@ -93,15 +93,15 @@ void add_mc_d_1(char* const ntp, RooStats::HistFactory::Channel& chan,
 // Main //
 //////////
 
-void add_mc(char* const ntp, RooStats::HistFactory::Channel& chan,
-            ArgProxy params) {
+void addMc(const char* ntp, RooStats::HistFactory::Channel& chan,
+           ArgProxy params) {
   // Define samples to be added here
   // clang-format off
   auto samples = std::vector<std::function<void(
       char* const, RooStats::HistFactory::Channel&, ArgProxy)>&>{
-    add_mc_norm,
-    add_mc_sig,
-    add_mc_d_1
+    addMcNorm,
+    addMcSig,
+    addMcD1
   };
   // clang-format on
 
