@@ -30,8 +30,8 @@ For a more faithful presentation of Phoebe's code, take a look at version [`0.1.
         clang-format-all
 
         # Pick your favorite version of ROOT here
-        #root
-        root_6_12_06
+        #root_6_24_02
+        root_6_16_00
         #root_5_34_38
       ];
     ```
