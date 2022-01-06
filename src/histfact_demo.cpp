@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:21 PM +0100
+// Last Change: Thu Jan 06, 2022 at 04:54 PM +0100
 
 #include <any>
 #include <functional>
@@ -108,8 +108,6 @@ void fit(ArgProxy params, Config addParams) {
 
   // set the lumi for the measurement.
   // only matters for the data-driven pdfs the way I've set it up.
-  // in invfb variable rellumi gives the relative luminosity between the
-  // data used to generate the pdfs and the sample we are fitting
   //
   // actually, now this is only used for the misID
   meas.SetLumi(params.get<double>("relLumi"));
@@ -316,7 +314,8 @@ int main(int argc, char **argv) {
      ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
     ("expMu", "?", cxxopts::value<double>()
      ->default_value("50e3"))
-    ("relLumi", "set real luminosity", cxxopts::value<double>()
+    ("relLumi", "set relative luminosity between data used to generate pdf"
+     " and the sample we are fitting, in fb^{-1}.", cxxopts::value<double>()
      ->default_value("1.0"))
     ;
   // clang-format on
