@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 01:57 AM +0100
+# Last Change: Thu Jan 06, 2022 at 03:08 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -28,6 +28,9 @@ args: cmd_demo
 	cmd_demo -m both_false --flag1 --flag2=false
 	cmd_demo -f "random_stuff.root"
 	cmd_demo -m all_zero
+
+load-histo: histo_loader_demo
+	histo_loader_demo -i ./inputs
 
 %: %.cpp flake.nix Makefile
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
