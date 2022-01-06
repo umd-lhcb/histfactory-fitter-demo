@@ -32,7 +32,7 @@
             # ROOT 6.24 stack
             root_6_24_02
 
-            # ROOT 6.16 stack
+            # ROOT 6.16 stack, plotting is bugged for this version
             #root_6_16_00
 
             # ROOT 5.34 stack
