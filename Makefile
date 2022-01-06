@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 05:36 AM +0100
+# Last Change: Thu Jan 06, 2022 at 04:57 PM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -11,8 +11,9 @@ LINKFLAGS	:=	$(shell root-config --libs)
 ADDCXXFLAGS	:=	-O2 -march=native -mtune=native -Iinclude
 ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory -lyaml-cpp
 
-HistFactDstTauDemo: $(HEADERS)
-CmdArgDemo: cmd.h
+histfact_demo: $(HEADERS)
+cmd_demo: cmd.h
+histo_loader_demo: loader.h
 
 .PHONY: all clean fit args load-histo
 
@@ -34,5 +35,5 @@ args: cmd_demo
 load-histo: histo_loader_demo
 	histo_loader_demo -i ./inputs
 
-%: %.cpp flake.nix include/*.h
+%: %.cpp flake.nix
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
