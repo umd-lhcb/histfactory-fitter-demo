@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Sun Jul 11, 2021 at 04:56 PM +0200
+// Last Change: Thu Jan 06, 2022 at 01:54 AM +0100
 
 #ifndef _FIT_DEMO_CMD_H_
 #define _FIT_DEMO_CMD_H_
@@ -13,14 +13,14 @@
 
 class ArgProxy {
  public:
-  ArgProxy(cxxopts::ParseResult &parsed_args, std::string const mode);
+  ArgProxy(cxxopts::ParseResult &parsedArgs, std::string const mode);
   template <typename T>
   T const get(std::string const key);
   void    set_mode(std::string const mode);
   void    set_default(std::string const mode, std::string const key,
                       std::any const val);
   void    set_default(std::string const               mode,
-                      std::map<std::string, std::any> default_map);
+                      std::map<std::string, std::any> defaultMap);
 
  private:
   cxxopts::ParseResult                                    m_parsed_args;
@@ -30,8 +30,8 @@ class ArgProxy {
   bool default_exist(std::string const mode, std::string const key);
 };
 
-ArgProxy::ArgProxy(cxxopts::ParseResult &parsed_args, std::string const mode)
-    : m_parsed_args(parsed_args), m_mode(mode) {}
+ArgProxy::ArgProxy(cxxopts::ParseResult &parsedArgs, std::string const mode)
+    : m_parsed_args(parsedArgs), m_mode(mode) {}
 
 template <typename T>
 T const ArgProxy::get(std::string const key) {
@@ -54,8 +54,8 @@ void ArgProxy::set_default(std::string const mode, std::string const key,
 }
 
 void ArgProxy::set_default(std::string const               mode,
-                           std::map<std::string, std::any> default_map) {
-  m_default_val[mode] = default_map;
+                           std::map<std::string, std::any> defaultMap) {
+  m_default_val[mode] = defaultMap;
 }
 
 bool ArgProxy::default_exist(std::string mode, std::string key) {
