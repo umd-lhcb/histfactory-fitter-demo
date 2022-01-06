@@ -6,3 +6,17 @@ demo.root:
     h_sigmu_v2m: h_sigmu_v2m
     h_sigmu_v3p: h_sigmu_v3p
     h_sigmu_v3m: h_sigmu_v3m
+    h_sigtau: h_sigtau
+    h_sigtau_v1p: h_sigtau_v1p
+    h_sigtau_v1m: h_sigtau_v1m
+    h_sigtau_v2p: h_sigtau_v2p
+    h_sigtau_v2m: h_sigtau_v2m
+    h_sigtau_v3p: h_sigtau_v3p
+    h_sigtau_v3m: h_sigtau_v3m
+    h_sigtau_v4p: h_sigtau_v4p
+    h_sigtau_v4m: h_sigtau_v4m
+    h_D1: h_D1
+    h_D1IWp: h_D1IWp
+    h_D1IWm: h_D1IWm
+    h_misID: h_misID
+    h_data: h_data
