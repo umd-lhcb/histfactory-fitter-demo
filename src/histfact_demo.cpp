@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 05:31 AM +0100
+// Last Change: Thu Jan 06, 2022 at 05:34 AM +0100
 
 #include <any>
 #include <functional>
@@ -366,17 +366,6 @@ int main(int argc, char **argv) {
     {"useDststShapeUncerts", true},
     {"fixShapes", false},
     {"fixShapesDstst", false},
-    {"useMinos", true},
-    {"bbOn3D", true}
-  });
-
-  parsedArgsProxy.set_default("naiveFit", map<string, any>{
-    {"constrainDstst", true},
-    {"useMuShapeUncerts", false},
-    {"useTauShapeUncerts", false},
-    {"useDststShapeUncerts", false},
-    {"fixShapes", true},
-    {"fixShapesDstst", true},
     {"useMinos", true},
     {"bbOn3D", true}
   });
