@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 07:19 PM +0100
+// Last Change: Thu Jan 06, 2022 at 04:37 AM +0100
 
 #include <any>
 #include <functional>
@@ -117,32 +117,13 @@ void fixShapesDstst(ModelConfig *mc) {
 // Fitter setup: Main //
 ////////////////////////
 
-void fit(TString inputFile, ArgProxy params) {
+void fit(ArgProxy params, Config addParams) {
   // avoid accidental unblinding!
   RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 
-  // Below: Read histogram file to generate normalization constants required to
-  // make each histo normalized to unity. Not totally necessary here, but
-  // convenient
-
-  TFile q(inputFile);
-  TH1 * htemp;
-
-  TString mchistos[3] = {"sigmu", "sigtau", "D1"};
-  double  mcN_sigmu, mcN_sigtau, mcN_D1;
-  double *mcnorms[3] = {&mcN_sigmu, &mcN_sigtau, &mcN_D1};
-  for (int i = 0; i < 3; i++) {
-    q.GetObject("h_" + mchistos[i], htemp);
-    assert(htemp != NULL);
-    *(mcnorms[i]) = 1. / htemp->Integral();
-    cout << "mcN_" + mchistos[i] + " = " << 1. / *(mcnorms[i]) << endl;
-  }
-
-  // Adding normalization factors
-  Config addParams{};
-  addParams.set("mcNorm_sigMu", mcN_sigmu);
-  addParams.set("mcNorm_sigTau", mcN_sigtau);
-  addParams.set("mcNorm_D1", mcN_D1);
+  //addParams.set("mcNorm_sigMu", mcN_sigmu);
+  //addParams.set("mcNorm_sigTau", mcN_sigtau);
+  //addParams.set("mcNorm_D1", mcN_D1);
 
   ///////////////////////
   // Initialize fitter //
@@ -177,7 +158,7 @@ void fit(TString inputFile, ArgProxy params) {
   // Load fit templates //
   ////////////////////////
   // clang-format off
-  vector<function<void(const char*, Channel&, ArgProxy, Config)>> templates{
+  vector<function<void(Channel&, ArgProxy, Config)>> templates{
     // Data
     addData, addMisId,
     // MC
@@ -185,7 +166,7 @@ void fit(TString inputFile, ArgProxy params) {
   };
   // clang-format on
 
-  for (auto &t : templates) t(inputFile.Data(), chan, params, addParams);
+  for (auto &t : templates) t(chan, params, addParams);
 
   meas.AddChannel(chan);
   meas.CollectHistograms();
@@ -351,7 +332,7 @@ int main(int argc, char **argv) {
   // clang-format off
   argOpts.add_options()
     ("h,help", "print usage")
-    ("i,inputFile", "input fit templates", cxxopts::value<string>())
+    ("i,inputDir", "input fit templates", cxxopts::value<string>())
     ("o,outputDir", "output directory", cxxopts::value<string>())
     ("m,mode", "fitter mode", cxxopts::value<string>()
      ->default_value("fullFit"))
@@ -399,8 +380,12 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  auto inputFile = TString(parsedArgs["inputFile"].as<string>());
-  fit(inputFile, parsedArgsProxy);
+  // Load histograms and compute normalization now
+  auto histoLoader = HistoLoader(parsedArgsProxy.get<string>("inputDir"));
+  histoLoader.load();
+  auto addParams = histoLoader.get_config();
+
+  fit(parsedArgsProxy, addParams);
 
   return 0;
 }
