@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 05:02 AM +0100
+// Last Change: Thu Jan 06, 2022 at 05:28 AM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -79,7 +79,7 @@ void addMcD1(RooStats::HistFactory::Channel& chan, ArgProxy params,
                        1.);
 
   if (params.get<bool>("useDststShapeUncerts"))
-    batchAddHistoSys(sample, {{"IW", "h_D1IWp", "h_D1IWm"}}, addParams);
+    batchAddHistoSys(sample, {{"IW", "h_D1IWm", "h_D1IWp"}}, addParams);
 
   if (params.get<bool>("bbOn3D")) sample.ActivateStatError();
 

@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 03:43 AM +0100
+# Last Change: Thu Jan 06, 2022 at 05:23 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -19,8 +19,8 @@ CmdArgDemo: cmd.h
 clean:
 	@rm -rf ./gen/*
 
-fit: inputs/DemoHistos.root histfact_demo
-	@histfact_demo -i $< -o gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+fit: inputs/* histfact_demo
+	histfact_demo -i inputs -o gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
 
 args: cmd_demo
 	cmd_demo --help

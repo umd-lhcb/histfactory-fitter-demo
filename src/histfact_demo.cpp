@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:37 AM +0100
+// Last Change: Thu Jan 06, 2022 at 05:31 AM +0100
 
 #include <any>
 #include <functional>
@@ -121,10 +121,6 @@ void fit(ArgProxy params, Config addParams) {
   // avoid accidental unblinding!
   RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
 
-  //addParams.set("mcNorm_sigMu", mcN_sigmu);
-  //addParams.set("mcNorm_sigTau", mcN_sigtau);
-  //addParams.set("mcNorm_D1", mcN_D1);
-
   ///////////////////////
   // Initialize fitter //
   ///////////////////////
@@ -165,11 +161,11 @@ void fit(ArgProxy params, Config addParams) {
     addMcNorm, addMcSig, addMcD1
   };
   // clang-format on
-
   for (auto &t : templates) t(chan, params, addParams);
 
   meas.AddChannel(chan);
-  meas.CollectHistograms();
+  // This is not needed as we have loaded the histograms manually
+  // meas.CollectHistograms();
 
   ///////////////////////////
   // Change fit parameters //
@@ -373,6 +369,17 @@ int main(int argc, char **argv) {
     {"useMinos", true},
     {"bbOn3D", true}
   });
+
+  parsedArgsProxy.set_default("naiveFit", map<string, any>{
+    {"constrainDstst", true},
+    {"useMuShapeUncerts", false},
+    {"useTauShapeUncerts", false},
+    {"useDststShapeUncerts", false},
+    {"fixShapes", true},
+    {"fixShapesDstst", true},
+    {"useMinos", true},
+    {"bbOn3D", true}
+  });
   // clang-format on
 
   if (parsedArgs.count("help")) {
@@ -381,7 +388,7 @@ int main(int argc, char **argv) {
   }
 
   // Load histograms and compute normalization now
-  auto histoLoader = HistoLoader(parsedArgsProxy.get<string>("inputDir"));
+  auto histoLoader = HistoLoader(parsedArgsProxy.get<string>("inputDir"), true);
   histoLoader.load();
   auto addParams = histoLoader.get_config();
 
