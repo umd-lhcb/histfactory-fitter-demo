@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:32 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:42 PM +0100
 
 #ifndef _FIT_DEMO_LOADER_H_
 #define _FIT_DEMO_LOADER_H_
@@ -25,6 +25,10 @@ using std::cout;
 using std::endl;
 
 using std::any;
+using std::any_cast;
+using std::map;
+using std::string;
+using std::vector;
 
 ////////////////
 // Error code //
@@ -42,32 +46,32 @@ using std::any;
 class Config {
  public:
   Config();
-  Config(std::map<std::string, any>& initMap);
+  Config(map<string, any>& initMap);
 
-  any& operator[](std::string key) { return m_map[key]; };
+  any& operator[](string key) { return m_map[key]; };
 
   template <typename T>
-  T const get(std::string const key);
-  void    set(std::string const key, any val);
+  T const get(string const key);
+  void    set(string const key, any val);
 
  private:
-  std::map<std::string, std::any> m_map;
+  map<string, any> m_map;
 };
 
 Config::Config() : m_map() {}
-Config::Config(std::map<std::string, std::any>& initMap) : m_map(initMap) {}
+Config::Config(map<string, any>& initMap) : m_map(initMap) {}
 
 template <typename T>
-T const Config::get(std::string const key) {
+T const Config::get(string const key) {
   if (m_map.find(key) == m_map.end()) {
     cerr << "Key " << key << " not found!" << endl;
     exit(KEY_NOT_FOUND);  // Terminate early for easier debug
   }
 
-  return std::any_cast<T>(m_map[key]);
+  return any_cast<T>(m_map[key]);
 }
 
-void Config::set(std::string const key, any val) { m_map[key] = val; }
+void Config::set(string const key, any val) { m_map[key] = val; }
 
 //////////////////////
 // Histogram loader //
@@ -75,42 +79,42 @@ void Config::set(std::string const key, any val) { m_map[key] = val; }
 
 class HistoLoader {
  public:
-  HistoLoader(std::string inputFolder, bool verbose);
-  HistoLoader(std::string inputFolder) : HistoLoader(inputFolder, false){};
+  HistoLoader(string inputFolder, bool verbose);
+  HistoLoader(string inputFolder) : HistoLoader(inputFolder, false){};
   ~HistoLoader();
 
   void   load();
   Config get_config() { return m_config; };
 
  private:
-  bool                m_verbose;
-  TString             m_dir;
-  TString             m_yml;
-  TString             m_yml_basename = "spec.yml";
-  Config              m_config;
-  std::vector<TFile*> m_ntps;
-  std::vector<TH1*>   m_histos;
+  bool           m_verbose;
+  TString        m_dir;
+  TString        m_yml;
+  TString        m_yml_basename = "spec.yml";
+  Config         m_config;
+  vector<TFile*> m_ntps;
+  vector<TH1*>   m_histos;
 
   YAML::Node load_yml(TString yamlFile);
   YAML::Node load_yml() { return load_yml(m_yml); }
 
-  void load_histo(TFile* ntp, std::string key, TString histoName);
-  void load_histo(TFile* ntp, std::string key, std::string histoName) {
+  void load_histo(TFile* ntp, string key, TString histoName);
+  void load_histo(TFile* ntp, string key, string histoName) {
     load_histo(ntp, key, TString(histoName));
   };
 
   TString abs_dir(TString folder);
-  TString abs_dir(std::string folder) { return abs_dir(TString(folder)); }
+  TString abs_dir(string folder) { return abs_dir(TString(folder)); }
 
   bool file_exist(TString file);
-  bool file_exist(std::string file) { return file_exist(TString(file)); };
+  bool file_exist(string file) { return file_exist(TString(file)); };
 
   double norm_fac(TH1* histo);
 };
 
 // Constructor/destructor //////////////////////////////////////////////////////
 
-HistoLoader::HistoLoader(std::string inputFolder, bool verbose)
+HistoLoader::HistoLoader(string inputFolder, bool verbose)
     : m_verbose(verbose), m_config() {
   m_dir = abs_dir(inputFolder);
   m_yml = m_dir + '/' + m_yml_basename;
@@ -128,7 +132,7 @@ void HistoLoader::load() {
   auto spec = load_yml();
 
   for (auto it = spec.begin(); it != spec.end(); it++) {
-    auto ntpName = TString(it->first.as<std::string>());
+    auto ntpName = TString(it->first.as<string>());
     if (m_verbose) cout << "Working on n-tuple: " << ntpName << endl;
 
     auto ntpFullPath = m_dir + "/" + ntpName;
@@ -141,8 +145,8 @@ void HistoLoader::load() {
     m_ntps.push_back(ntp);
 
     for (auto iit = it->second.begin(); iit != it->second.end(); iit++) {
-      auto key       = iit->first.as<std::string>();
-      auto histoName = iit->second.as<std::string>();
+      auto key       = iit->first.as<string>();
+      auto histoName = iit->second.as<string>();
       load_histo(ntp, key, histoName);
     }
   }
@@ -161,7 +165,7 @@ YAML::Node HistoLoader::load_yml(TString yamlFile) {
   return YAML::LoadFile(yamlFile.Data());
 }
 
-void HistoLoader::load_histo(TFile* ntp, std::string key, TString histoName) {
+void HistoLoader::load_histo(TFile* ntp, string key, TString histoName) {
   if (m_verbose) cout << "  Loading " << histoName << " as " << key << endl;
 
   auto histo = static_cast<TH1*>(ntp->Get(histoName));

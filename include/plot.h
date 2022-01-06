@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 12:09 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:40 PM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -22,6 +22,7 @@
 #include <RooStats/HistFactory/HistFactorySimultaneous.h>
 
 using RooStats::HistFactory::HistFactorySimultaneous;
+using std::vector;
 
 /////////////
 // Helpers //
@@ -74,9 +75,9 @@ void setFitVarsFrameStyle(TCanvas* cvs, RooPlot* frame, int idx) {
   frame->GetYaxis()->SetTitle(title);
 }
 
-std::unique_ptr<TCanvas> plotFitVars(std::vector<RooPlot*>& frames,
-                                     std::vector<double>&   anchors,
-                                     char const* name, int width, int height) {
+std::unique_ptr<TCanvas> plotFitVars(vector<RooPlot*>& frames,
+                                     vector<double>& anchors, char const* name,
+                                     int width, int height) {
   auto cvs = std::make_unique<TCanvas>(name, name, width, height);
   cvs->SetTickx();
   cvs->SetTicky();
@@ -97,13 +98,12 @@ std::unique_ptr<TCanvas> plotFitVars(std::vector<RooPlot*>& frames,
 // Plot C1 //
 /////////////
 
-std::vector<RooPlot*> plotC1(std::vector<RooRealVar*> vars,
-                             std::vector<TString> titles, RooAbsData* data,
-                             HistFactorySimultaneous* model_hf,
-                             RooCategory*             ch_cat) {
+vector<RooPlot*> plotC1(vector<RooRealVar*> vars, vector<TString> titles,
+                        RooAbsData* data, HistFactorySimultaneous* model_hf,
+                        RooCategory* ch_cat) {
   using namespace RooFit;
 
-  std::vector<RooPlot*> frames{};
+  vector<RooPlot*> frames{};
 
   for (int idx = 0; idx < vars.size(); idx++) {
     frames.push_back(vars[idx]->frame(Title(titles[idx])));

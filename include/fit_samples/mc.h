@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:14 PM +0100
+// Last Change: Thu Jan 06, 2022 at 04:43 PM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -13,14 +13,15 @@
 #include "loader.h"
 #include "utils.h"
 
+using RooStats::HistFactory::Channel;
+
 /////////////
 // Samples //
 /////////////
 // MC samples to model the data
 
 // B0 -> D*MuNu (normalization)
-void addMcNorm(RooStats::HistFactory::Channel& chan, ArgProxy params,
-               Config addParams) {
+void addMcNorm(Channel& chan, ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_sigmu");
   sample.SetHisto(addParams.get<TH1*>("h_sigmu"));
 
@@ -43,8 +44,7 @@ void addMcNorm(RooStats::HistFactory::Channel& chan, ArgProxy params,
 }
 
 // B0 -> D*TauNu (signal)
-void addMcSig(RooStats::HistFactory::Channel& chan, ArgProxy params,
-              Config addParams) {
+void addMcSig(Channel& chan, ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_sigtau");
   sample.SetHisto(addParams.get<TH1*>("h_sigtau"));
 
@@ -69,8 +69,7 @@ void addMcSig(RooStats::HistFactory::Channel& chan, ArgProxy params,
 }
 
 // B0 -> D_1MuNu (D** bkg)
-void addMcD1(RooStats::HistFactory::Channel& chan, ArgProxy params,
-             Config addParams) {
+void addMcD1(Channel& chan, ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_D1");
   sample.SetHisto(addParams.get<TH1*>("h_D1"));
 

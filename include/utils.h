@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:13 PM +0100
+// Last Change: Thu Jan 06, 2022 at 04:40 PM +0100
 
 #ifndef _FIT_DEMO_UTILS_H_
 #define _FIT_DEMO_UTILS_H_
@@ -16,6 +16,8 @@
 
 #include "loader.h"
 
+using RooStats::ModelConfig;
+using RooStats::HistFactory::Sample;
 using std::map;
 using std::string;
 using std::vector;
@@ -24,8 +26,8 @@ using std::vector;
 // For fit templates //
 ///////////////////////
 
-void batchAddHistoSys(RooStats::HistFactory::Sample &sample,
-                      vector<vector<string>> spec, Config addParams) {
+void batchAddHistoSys(Sample &sample, vector<vector<string>> spec,
+                      Config addParams) {
   for (auto s : spec) {
     auto hSys = RooStats::HistFactory::HistoSys();
     hSys.SetName(s[0]);
@@ -43,7 +45,7 @@ void batchAddHistoSys(RooStats::HistFactory::Sample &sample,
 typedef map<TString, double>         NuParamKeyVal;
 typedef map<TString, vector<double>> NuParamKeyRange;
 
-void setNuisanceParamConst(RooStats::ModelConfig *mc, vector<TString> params,
+void setNuisanceParamConst(ModelConfig *mc, vector<TString> params,
                            bool verbose = false) {
   for (const auto &p : params) {
     auto nuParam =
@@ -54,7 +56,7 @@ void setNuisanceParamConst(RooStats::ModelConfig *mc, vector<TString> params,
   }
 }
 
-void setNuisanceParamVal(RooStats::ModelConfig *mc, NuParamKeyVal keyVal) {
+void setNuisanceParamVal(ModelConfig *mc, NuParamKeyVal keyVal) {
   for (const auto &kv : keyVal) {
     auto nuParam =
         static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(kv.first));
@@ -63,8 +65,7 @@ void setNuisanceParamVal(RooStats::ModelConfig *mc, NuParamKeyVal keyVal) {
   }
 }
 
-void setNuisanceParamRange(RooStats::ModelConfig *mc,
-                           NuParamKeyRange        keyRange) {
+void setNuisanceParamRange(ModelConfig *mc, NuParamKeyRange keyRange) {
   for (const auto &kv : keyRange) {
     auto nuParam =
         static_cast<RooRealVar *>(mc->GetNuisanceParameters()->find(kv.first));

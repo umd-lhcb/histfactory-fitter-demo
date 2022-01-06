@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 05:03 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:43 PM +0100
 
 #ifndef _FIT_DEMO_CH_DATA_H_
 #define _FIT_DEMO_CH_DATA_H_
@@ -12,18 +12,18 @@
 #include "cmd.h"
 #include "loader.h"
 
+using RooStats::HistFactory::Channel;
+
 /////////////
 // Samples //
 /////////////
 // Data and data-driven samples
 
-void addData(RooStats::HistFactory::Channel& chan, ArgProxy params,
-             Config addParams) {
+void addData(Channel& chan, ArgProxy params, Config addParams) {
   chan.SetData(addParams.get<TH1*>("h_data"));
 }
 
-void addMisId(RooStats::HistFactory::Channel& chan, ArgProxy params,
-              Config addParams) {
+void addMisId(Channel& chan, ArgProxy params, Config addParams) {
   RooStats::HistFactory::Sample sample("h_misID");
   sample.SetHisto(addParams.get<TH1*>("h_misID"));
 
