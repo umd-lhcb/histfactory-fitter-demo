@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 03:11 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:34 AM +0100
 
 #include <iostream>
 #include <string>
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
   // clang-format off
   argOpts.add_options()
     ("h,help", "print usage")
-    ("i,inputFolder", "input folder containing ntuples and a spec.yml.",
+    ("i,inputDir", "input folder containing ntuples and a spec.yml.",
      cxxopts::value<string>())
     ;
   // clang-format on
@@ -36,6 +36,6 @@ int main(int argc, char** argv) {
   }
 
   auto histoLoader =
-      HistoLoader(parsedArgsProxy.get<string>("inputFolder"), true);
+      HistoLoader(parsedArgsProxy.get<string>("inputDir"), true);
   histoLoader.load();
 }
