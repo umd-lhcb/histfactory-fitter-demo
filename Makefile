@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 01:41 AM +0100
+# Last Change: Thu Jan 06, 2022 at 01:57 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -23,11 +23,11 @@ fit: inputs/DemoHistos.root histfact_demo
 	@histfact_demo -i $< -o gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
 
 args: cmd_demo
-	@cmd_demo --help
-	@cmd_demo --int1 233
-	@cmd_demo -m both_false --flag1 --flag2=false
-	@cmd_demo -f "random_stuff.root"
-	@cmd_demo -m all_zero
+	cmd_demo --help
+	cmd_demo --int1 233
+	cmd_demo -m both_false --flag1 --flag2=false
+	cmd_demo -f "random_stuff.root"
+	cmd_demo -m all_zero
 
 %: %.cpp flake.nix Makefile
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
