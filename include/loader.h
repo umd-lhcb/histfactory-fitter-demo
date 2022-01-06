@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:25 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:32 AM +0100
 
 #ifndef _FIT_DEMO_LOADER_H_
 #define _FIT_DEMO_LOADER_H_
@@ -78,7 +78,9 @@ class HistoLoader {
   HistoLoader(std::string inputFolder, bool verbose);
   HistoLoader(std::string inputFolder) : HistoLoader(inputFolder, false){};
   ~HistoLoader();
-  void load();
+
+  void   load();
+  Config get_config() { return m_config; };
 
  private:
   bool                m_verbose;
