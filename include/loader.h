@@ -1,11 +1,10 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:42 PM +0100
+// Last Change: Thu Jan 06, 2022 at 05:22 PM +0100
 
 #ifndef _FIT_DEMO_LOADER_H_
 #define _FIT_DEMO_LOADER_H_
 
-#include <any>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -19,13 +18,14 @@
 #include <TString.h>
 
 #include <yaml-cpp/yaml.h>
+#include <boost/any.hpp>
 
 using std::cerr;
 using std::cout;
 using std::endl;
 
-using std::any;
-using std::any_cast;
+using boost::any;
+using boost::any_cast;
 using std::map;
 using std::string;
 using std::vector;

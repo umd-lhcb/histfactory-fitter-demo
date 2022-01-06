@@ -26,6 +26,7 @@
             # Third-party build dependencies
             cxxopts
             libyamlcpp
+            boost
 
             # Pick your favorite version of ROOT here
             # ROOT 6.24 stack
