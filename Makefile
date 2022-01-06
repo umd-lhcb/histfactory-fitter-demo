@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 05:23 AM +0100
+# Last Change: Thu Jan 06, 2022 at 05:36 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -14,7 +14,9 @@ ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory -lyaml-cpp
 HistFactDstTauDemo: $(HEADERS)
 CmdArgDemo: cmd.h
 
-.PHONY: clean fit args
+.PHONY: all clean fit args load-histo
+
+all: clean args load-histo fit
 
 clean:
 	@rm -rf ./gen/*
