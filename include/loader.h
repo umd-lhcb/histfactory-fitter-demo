@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 03:44 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:25 AM +0100
 
 #ifndef _FIT_DEMO_LOADER_H_
 #define _FIT_DEMO_LOADER_H_
@@ -24,6 +24,17 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+using std::any;
+
+////////////////
+// Error code //
+////////////////
+
+#define KEY_NOT_FOUND 1
+#define FOLDER_NOT_FOUND 11
+#define FILE_NOT_FOUND 12
+#define HISTO_NOT_FOUND 13
+
 //////////////////////////////////////
 // Smarter way to store loaded info //
 //////////////////////////////////////
@@ -31,10 +42,13 @@ using std::endl;
 class Config {
  public:
   Config();
-  Config(std::map<std::string, std::any>& initMap);
+  Config(std::map<std::string, any>& initMap);
+
+  any& operator[](std::string key) { return m_map[key]; };
+
   template <typename T>
   T const get(std::string const key);
-  void    set(std::string const key, std::any val);
+  void    set(std::string const key, any val);
 
  private:
   std::map<std::string, std::any> m_map;
@@ -47,13 +61,13 @@ template <typename T>
 T const Config::get(std::string const key) {
   if (m_map.find(key) == m_map.end()) {
     cerr << "Key " << key << " not found!" << endl;
-    exit(1);  // Terminate early for easier debug
+    exit(KEY_NOT_FOUND);  // Terminate early for easier debug
   }
 
   return std::any_cast<T>(m_map[key]);
 }
 
-void Config::set(std::string const key, std::any val) { m_map[key] = val; }
+void Config::set(std::string const key, any val) { m_map[key] = val; }
 
 //////////////////////
 // Histogram loader //
@@ -75,14 +89,21 @@ class HistoLoader {
   std::vector<TFile*> m_ntps;
   std::vector<TH1*>   m_histos;
 
-  TString abs_dir(TString folder);
-  TString abs_dir(std::string folder) { return abs_dir(TString(folder)); }
-
   YAML::Node load_yml(TString yamlFile);
   YAML::Node load_yml() { return load_yml(m_yml); }
 
+  void load_histo(TFile* ntp, std::string key, TString histoName);
+  void load_histo(TFile* ntp, std::string key, std::string histoName) {
+    load_histo(ntp, key, TString(histoName));
+  };
+
+  TString abs_dir(TString folder);
+  TString abs_dir(std::string folder) { return abs_dir(TString(folder)); }
+
   bool file_exist(TString file);
   bool file_exist(std::string file) { return file_exist(TString(file)); };
+
+  double norm_fac(TH1* histo);
 };
 
 // Constructor/destructor //////////////////////////////////////////////////////
@@ -95,8 +116,8 @@ HistoLoader::HistoLoader(std::string inputFolder, bool verbose)
 
 HistoLoader::~HistoLoader() {
   if (m_verbose) cout << "Cleaning up..." << endl;
-  for (auto p : m_ntps) delete p;
   for (auto p : m_histos) delete p;
+  for (auto p : m_ntps) delete p;
 }
 
 // Public //////////////////////////////////////////////////////////////////////
@@ -104,25 +125,62 @@ HistoLoader::~HistoLoader() {
 void HistoLoader::load() {
   auto spec = load_yml();
 
-  for (YAML::const_iterator it = spec.begin(); it != spec.end(); it++) {
+  for (auto it = spec.begin(); it != spec.end(); it++) {
     auto ntpName = TString(it->first.as<std::string>());
     if (m_verbose) cout << "Working on n-tuple: " << ntpName << endl;
 
     auto ntpFullPath = m_dir + "/" + ntpName;
-    auto ntp         = new TFile(ntpFullPath);
+    if (!file_exist(ntpFullPath)) {
+      cerr << "n-tuple " << ntpFullPath << " doesn't exist!" << endl;
+      exit(FILE_NOT_FOUND);
+    }
+
+    auto ntp = new TFile(ntpFullPath);
     m_ntps.push_back(ntp);
 
-    for (YAML::const_iterator iit = it->second.begin(); iit != it->second.end();
-         iit++) {
-      auto histoKey  = iit->first.as<std::string>();
-      auto histoName = TString(iit->second.as<std::string>());
-      if (m_verbose)
-        cout << "Loading " << histoName << " as " << histoKey << endl;
+    for (auto iit = it->second.begin(); iit != it->second.end(); iit++) {
+      auto key       = iit->first.as<std::string>();
+      auto histoName = iit->second.as<std::string>();
+      load_histo(ntp, key, histoName);
     }
   }
 }
 
-// Private /////////////////////////////////////////////////////////////////////
+// Private: loaders ////////////////////////////////////////////////////////////
+
+YAML::Node HistoLoader::load_yml(TString yamlFile) {
+  if (m_verbose) cout << "Loading " << yamlFile << endl;
+
+  if (!file_exist(yamlFile)) {
+    cerr << "YAML " << yamlFile << " doesn't exist!" << endl;
+    exit(FILE_NOT_FOUND);
+  }
+
+  return YAML::LoadFile(yamlFile.Data());
+}
+
+void HistoLoader::load_histo(TFile* ntp, std::string key, TString histoName) {
+  if (m_verbose) cout << "  Loading " << histoName << " as " << key << endl;
+
+  auto histo = static_cast<TH1*>(ntp->Get(histoName));
+  if (histo == nullptr) {
+    cerr << "Histo " << histoName << " doesn't exist!" << endl;
+    exit(HISTO_NOT_FOUND);
+  }
+
+  m_config[key]              = histo;
+  m_config[key + "_NormFac"] = norm_fac(histo);
+}
+
+// Private: helpers ////////////////////////////////////////////////////////////
+
+bool HistoLoader::file_exist(TString file) {
+  if (FILE* _file = fopen(file.Data(), "r")) {
+    fclose(_file);
+    return true;
+  } else
+    return false;
+}
 
 TString HistoLoader::abs_dir(TString folder) {
   auto abs_path = realpath(folder.Data(), nullptr);
@@ -132,26 +190,13 @@ TString HistoLoader::abs_dir(TString folder) {
   }
 
   cerr << "Folder " << folder << " cannot be resolved!" << endl;
-  exit(11);
+  exit(FOLDER_NOT_FOUND);
 }
 
-YAML::Node HistoLoader::load_yml(TString yamlFile) {
-  if (m_verbose) cout << "Loading " << yamlFile << endl;
-
-  if (!file_exist(yamlFile)) {
-    cerr << "YAML " << yamlFile << " doesn't exist!" << endl;
-    exit(12);
-  }
-
-  return YAML::LoadFile(yamlFile.Data());
-}
-
-bool HistoLoader::file_exist(TString file) {
-  if (FILE* _file = fopen(file.Data(), "r")) {
-    fclose(_file);
-    return true;
-  } else
-    return false;
+double HistoLoader::norm_fac(TH1* histo) {
+  auto fac = 1. / histo->Integral();
+  if (m_verbose) cout << "    with a normalization factor " << fac << endl;
+  return fac;
 }
 
 #endif
