@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 01:54 AM +0100
+// Last Change: Thu Jan 06, 2022 at 02:26 AM +0100
 
 #ifndef _FIT_DEMO_CMD_H_
 #define _FIT_DEMO_CMD_H_
@@ -10,6 +10,10 @@
 #include <string>
 
 #include <cxxopts.hpp>
+
+///////////////////////////////////
+// Smarter way to store CLI args //
+///////////////////////////////////
 
 class ArgProxy {
  public:
