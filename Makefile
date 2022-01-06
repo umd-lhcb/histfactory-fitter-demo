@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Tue Jan 04, 2022 at 04:21 AM +0100
+# Last Change: Thu Jan 06, 2022 at 01:41 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -9,7 +9,7 @@ COMPILER	:=	$(shell root-config --cxx)
 CXXFLAGS	:=	$(shell root-config --cflags)
 LINKFLAGS	:=	$(shell root-config --libs)
 ADDCXXFLAGS	:=	-O2 -march=native -mtune=native -Iinclude
-ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory
+ADDLINKFLAGS	:=	-lRooFitCore -lRooFit -lRooStats -lHistFactory -lyaml-cpp
 
 HistFactDstTauDemo: $(HEADERS)
 CmdArgDemo: cmd.h

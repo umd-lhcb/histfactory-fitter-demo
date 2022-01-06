@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jan 04, 2022 at 04:14 AM +0100
+// Last Change: Thu Jan 06, 2022 at 01:48 AM +0100
 
 #include <iostream>
 #include <string>
@@ -17,11 +17,11 @@ T SUM(T, T);
 
 int main(int argc, char** argv) {
   // Define command line parser
-  cxxopts::Options argparse("cmd_demo",
-                            "a demo for parsing command line options");
+  cxxopts::Options argOpts("cmd_demo",
+                           "a demo for parsing command line options");
 
   // clang-format off
-  argparse.add_options()
+  argOpts.add_options()
     ("h,help", "print usage")
     ("d,debug", "enable debugging")  // bool by default
     ("flag1", "first bool param")
@@ -37,49 +37,49 @@ int main(int argc, char** argv) {
     ;
   // clang-format on
 
-  auto parsed_args = argparse.parse(argc, argv);
-  auto mode        = parsed_args["mode"].as<std::string>();
+  auto parsedArgs = argOpts.parse(argc, argv);
+  auto mode       = parsedArgs["mode"].as<std::string>();
 
   // Define default values for modes
-  auto parsed_args_proxy = ArgProxy(parsed_args, mode);
-  parsed_args_proxy.set_default("both_true", "flag1", true);
-  parsed_args_proxy.set_default("both_true", "flag2", true);
+  auto parsedArgsProxy = ArgProxy(parsedArgs, mode);
+  parsedArgsProxy.set_default("both_true", "flag1", true);
+  parsedArgsProxy.set_default("both_true", "flag2", true);
 
-  parsed_args_proxy.set_default("both_false", "flag1", false);
-  parsed_args_proxy.set_default("both_false", "flag2", false);
+  parsedArgsProxy.set_default("both_false", "flag1", false);
+  parsedArgsProxy.set_default("both_false", "flag2", false);
 
-  parsed_args_proxy.set_default("both_zero", "int1", 0);
-  parsed_args_proxy.set_default("both_zero", "int2", 0);
+  parsedArgsProxy.set_default("both_zero", "int1", 0);
+  parsedArgsProxy.set_default("both_zero", "int2", 0);
 
   // clang-format off
-  parsed_args_proxy.set_default("all_zero", map<string, any>{
-      {"flag1", false},
-      {"flag2", false},
-      {"int1", 0},
-      {"int2", 0},
-      {"filename", "zero"s}
+  parsedArgsProxy.set_default("all_zero", map<string, any>{
+    {"flag1", false},
+    {"flag2", false},
+    {"int1", 0},
+    {"int2", 0},
+    {"filename", "zero"s}
   });
   // clang-format on
 
-  if (parsed_args.count("help")) {
-    cout << argparse.help() << endl;
+  if (parsedArgs.count("help")) {
+    cout << argOpts.help() << endl;
     exit(0);
   }
 
-  auto filename = parsed_args_proxy.get<string>("filename");
-  cout << "Sample filename is: " << filename.c_str() << endl;
+  auto filename = parsedArgsProxy.get<string>("filename");
+  cout << "Sample filename is: " << filename << endl;
 
-  auto flag1_raw = parsed_args["flag1"].as<bool>();
-  auto flag2_raw = parsed_args["flag2"].as<bool>();
-  cout << "First raw flag: " << flag1_raw << ", second raw flag: " << flag2_raw
+  auto flag1Raw = parsedArgs["flag1"].as<bool>();
+  auto flag2Raw = parsedArgs["flag2"].as<bool>();
+  cout << "First raw flag: " << flag1Raw << ", second raw flag: " << flag2Raw
        << endl;
 
-  auto flag1 = parsed_args_proxy.get<bool>("flag1");
-  auto flag2 = parsed_args_proxy.get<bool>("flag2");
+  auto flag1 = parsedArgsProxy.get<bool>("flag1");
+  auto flag2 = parsedArgsProxy.get<bool>("flag2");
   cout << "First flag: " << flag1 << ", second flag: " << flag2 << endl;
 
-  auto int1 = parsed_args_proxy.get<int>("int1");
-  auto int2 = parsed_args_proxy.get<int>("int2");
+  auto int1 = parsedArgsProxy.get<int>("int1");
+  auto int2 = parsedArgsProxy.get<int>("int2");
   cout << "First int: " << int1 << ", second int: " << int2 << endl;
   cout << "The sum of the two is: " << SUM(int1, int2) << endl;
 }
