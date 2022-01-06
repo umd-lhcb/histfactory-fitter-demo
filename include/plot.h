@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:40 PM +0100
+// Last Change: Thu Jan 06, 2022 at 06:14 PM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -24,6 +24,18 @@
 using RooStats::HistFactory::HistFactorySimultaneous;
 using std::vector;
 
+// Stolen from:
+//   https://favoritekk.github.io/programming/std_make_unique_in_cpp_11/
+#if __cplusplus >= 201402L  // C++14 and beyond
+using std::make_unique;
+#else
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  static_assert(!std::is_array<T>::value, "arrays not supported");
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+#endif
+
 /////////////
 // Helpers //
 /////////////
@@ -37,7 +49,7 @@ void setGlobalPlotStyle() {
 }
 
 std::unique_ptr<TLatex> makeLabel() {
-  auto lbl = std::make_unique<TLatex>();
+  auto lbl = make_unique<TLatex>();
   lbl->SetTextAlign(22);
   lbl->SetTextSize(0.06);
   lbl->SetTextFont(132);
@@ -78,7 +90,7 @@ void setFitVarsFrameStyle(TCanvas* cvs, RooPlot* frame, int idx) {
 std::unique_ptr<TCanvas> plotFitVars(vector<RooPlot*>& frames,
                                      vector<double>& anchors, char const* name,
                                      int width, int height) {
-  auto cvs = std::make_unique<TCanvas>(name, name, width, height);
+  auto cvs = make_unique<TCanvas>(name, name, width, height);
   cvs->SetTickx();
   cvs->SetTicky();
   cvs->Divide(frames.size(), 1);

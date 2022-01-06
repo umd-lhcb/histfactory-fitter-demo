@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 04:34 AM +0100
+// Last Change: Thu Jan 06, 2022 at 06:05 PM +0100
 
 #include <iostream>
 #include <string>
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
   auto parsedArgs = argOpts.parse(argc, argv);
 
   // Define default values for modes
-  auto parsedArgsProxy = ArgProxy(parsedArgs, "default"s);
+  auto parsedArgsProxy = ArgProxy(parsedArgs, "default");
 
   if (parsedArgs.count("help")) {
     cout << argOpts.help() << endl;

@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 01:48 AM +0100
+// Last Change: Thu Jan 06, 2022 at 06:04 PM +0100
 
 #include <iostream>
 #include <string>
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     {"flag2", false},
     {"int1", 0},
     {"int2", 0},
-    {"filename", "zero"s}
+    {"filename", string("zero")}
   });
   // clang-format on
 
