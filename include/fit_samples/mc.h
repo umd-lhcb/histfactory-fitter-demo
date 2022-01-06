@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 05:35 AM +0100
+// Last Change: Thu Jan 06, 2022 at 04:14 PM +0100
 
 #ifndef _FIT_DEMO_CH_MC_H_
 #define _FIT_DEMO_CH_MC_H_
@@ -56,9 +56,9 @@ void addMcSig(RooStats::HistFactory::Channel& chan, ArgProxy params,
 
   if (params.get<bool>("useTauShapeUncerts")) {
     batchAddHistoSys(sample,
-                     {{"v1tau", "h_sigtau_v1m", "h_sigtau_v1p"},
-                      {"v2tau", "h_sigtau_v2m", "h_sigtau_v2p"},
-                      {"v3tau", "h_sigtau_v3m", "h_sigtau_v3p"},
+                     {{"v1mu", "h_sigtau_v1m", "h_sigtau_v1p"},
+                      {"v2mu", "h_sigtau_v2m", "h_sigtau_v2p"},
+                      {"v3mu", "h_sigtau_v3m", "h_sigtau_v3p"},
                       {"v4tau", "h_sigtau_v4m", "h_sigtau_v4p"}},
                      addParams);
   }
