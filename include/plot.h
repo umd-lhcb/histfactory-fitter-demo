@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 06:14 PM +0100
+// Last Change: Fri Jan 07, 2022 at 04:29 PM +0100
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -111,8 +111,8 @@ std::unique_ptr<TCanvas> plotFitVars(vector<RooPlot*>& frames,
 /////////////
 
 vector<RooPlot*> plotC1(vector<RooRealVar*> vars, vector<TString> titles,
-                        RooAbsData* data, HistFactorySimultaneous* model_hf,
-                        RooCategory* ch_cat) {
+                        RooAbsData* data, HistFactorySimultaneous* modelHf,
+                        RooCategory* chCat) {
   using namespace RooFit;
 
   vector<RooPlot*> frames{};
@@ -123,17 +123,16 @@ vector<RooPlot*> plotC1(vector<RooRealVar*> vars, vector<TString> titles,
     data->plotOn(frames[idx], DataError(RooAbsData::Poisson),
                  Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
 
-    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
-                     DrawOption("F"), FillColor(kRed));
-    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
-                     DrawOption("F"), FillColor(kViolet),
-                     Components("*misID*,*sigmu*,*D1*"));
-    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
-                     DrawOption("F"), FillColor(kBlue + 1),
-                     Components("*misID*,*sigmu*"));
-    model_hf->plotOn(frames[idx], Slice(*ch_cat), ProjWData(*ch_cat, *data),
-                     DrawOption("F"), FillColor(kOrange),
-                     Components("*misID*"));
+    modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
+                    DrawOption("F"), FillColor(kRed));
+    modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
+                    DrawOption("F"), FillColor(kViolet),
+                    Components("*misID*,*sigmu*,*D1*"));
+    modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
+                    DrawOption("F"), FillColor(kBlue + 1),
+                    Components("*misID*,*sigmu*"));
+    modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
+                    DrawOption("F"), FillColor(kOrange), Components("*misID*"));
   }
 
   return frames;

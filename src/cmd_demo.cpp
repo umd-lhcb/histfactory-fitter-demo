@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 06:04 PM +0100
+// Last Change: Fri Jan 07, 2022 at 04:31 PM +0100
 
 #include <iostream>
 #include <string>
@@ -42,17 +42,17 @@ int main(int argc, char** argv) {
 
   // Define default values for modes
   auto parsedArgsProxy = ArgProxy(parsedArgs, mode);
-  parsedArgsProxy.set_default("both_true", "flag1", true);
-  parsedArgsProxy.set_default("both_true", "flag2", true);
+  parsedArgsProxy.setDefault("both_true", "flag1", true);
+  parsedArgsProxy.setDefault("both_true", "flag2", true);
 
-  parsedArgsProxy.set_default("both_false", "flag1", false);
-  parsedArgsProxy.set_default("both_false", "flag2", false);
+  parsedArgsProxy.setDefault("both_false", "flag1", false);
+  parsedArgsProxy.setDefault("both_false", "flag2", false);
 
-  parsedArgsProxy.set_default("both_zero", "int1", 0);
-  parsedArgsProxy.set_default("both_zero", "int2", 0);
+  parsedArgsProxy.setDefault("both_zero", "int1", 0);
+  parsedArgsProxy.setDefault("both_zero", "int2", 0);
 
   // clang-format off
-  parsedArgsProxy.set_default("all_zero", map<string, any>{
+  parsedArgsProxy.setDefault("all_zero", map<string, any>{
     {"flag1", false},
     {"flag2", false},
     {"int1", 0},

@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Thu Jan 06, 2022 at 05:22 PM +0100
+// Last Change: Fri Jan 07, 2022 at 04:32 PM +0100
 
 #include <functional>
 #include <iostream>
@@ -325,7 +325,7 @@ int main(int argc, char **argv) {
   // Define default values for modes
   auto parsedArgsProxy = ArgProxy(parsedArgs, mode);
   // clang-format off
-  parsedArgsProxy.set_default("fullFit", map<string, any>{
+  parsedArgsProxy.setDefault("fullFit", map<string, any>{
     {"constrainDstst", true},
     {"useMuShapeUncerts", true},
     {"useTauShapeUncerts", true},
@@ -345,7 +345,7 @@ int main(int argc, char **argv) {
   // Load histograms and compute normalization now
   auto histoLoader = HistoLoader(parsedArgsProxy.get<string>("inputDir"), true);
   histoLoader.load();
-  auto addParams = histoLoader.get_config();
+  auto addParams = histoLoader.getConfig();
 
   fit(parsedArgsProxy, addParams);
 
