@@ -1,4 +1,4 @@
-# histfactory-fitter-demo
+# histfactory-fitter-demo [![github CI](https://github.com/umd-lhcb/histfactory-fitter-demo/workflows/CI/badge.svg?branch=master)](https://github.com/umd-lhcb/histfactory-fitter-demo/actions?query=workflow%3ACI)
 
 A simple HistFactory fitter based on Phoebe's demo R(D*) fitter.
 

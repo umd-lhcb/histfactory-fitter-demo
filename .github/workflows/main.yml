@@ -13,11 +13,10 @@ jobs:
       with:
           extra_nix_config: |
               access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-
     - uses: cachix/cachix-action@v10
       with:
-          name: umd-lhcb/histfactory-fitter-demo
-    - run: nix develop --no-update-lock-file -c make
+          name: histfactory-fitter-demo
+    - run: nix develop --no-update-lock-file -c make fit
 
     - uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
