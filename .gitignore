@@ -1,6 +1,7 @@
 gen
 results
 logs
+dev-profile*
 .direnv
 
 .lvimrc

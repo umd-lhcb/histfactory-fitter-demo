@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Thu Jan 06, 2022 at 04:57 PM +0100
+# Last Change: Tue Jan 11, 2022 at 04:40 AM +0100
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")
@@ -34,6 +34,11 @@ args: cmd_demo
 
 load-histo: histo_loader_demo
 	histo_loader_demo -i ./inputs
+
+cache:
+	@echo "Don't forget to export CACHIX_AUTH_TOKEN=<TOKEN> first!"
+	@nix develop --profile dev-profile -c echo "dev shell built."
+	@cachix push histfactory-fitter-demo dev-profile
 
 %: %.cpp flake.nix
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)

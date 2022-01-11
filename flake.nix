@@ -22,6 +22,7 @@
             # Utilities
             clang-tools
             clang-format-all
+            cachix
 
             # Third-party build dependencies
             cxxopts
