@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Fri Jan 07, 2022 at 04:32 PM +0100
+// Last Change: Wed Jan 19, 2022 at 01:40 AM +0100
 
 #include <functional>
 #include <iostream>
@@ -77,7 +77,7 @@ void fixShapes(ModelConfig *mc) {
 }
 
 void fixShapesDstst(ModelConfig *mc) {
-  setNuisanceParamVal(mc, {{"alpha_IW", 0.005 /* -2.187 */}});
+  setNuisanceParamVal(mc, {{"alpha_IW", -0.005 /* -2.187 */}});
 }
 
 ////////////////////////
