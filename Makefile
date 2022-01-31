@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Mon Jan 31, 2022 at 05:16 PM -0500
+# Last Change: Mon Jan 31, 2022 at 06:06 PM -0500
 
 export PATH	:=	gen:$(PATH)
 
@@ -40,7 +40,7 @@ load-histo: histo_loader_demo
 cache:
 	@echo "Don't forget to export CACHIX_AUTH_TOKEN=<TOKEN> first!"
 	@nix develop --profile dev-profile -c echo "dev shell built."
-	@cachix push histfactory-fitter-demo dev-profile
+	@cachix push histfactory-basis dev-profile
 
 %: %.cpp flake.nix
 	$(COMPILER) $(CXXFLAGS) $(ADDCXXFLAGS) -o gen/$@ $< $(LINKFLAGS) $(ADDLINKFLAGS)
