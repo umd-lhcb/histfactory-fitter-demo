@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jan 31, 2022 at 05:06 PM -0500
+// Last Change: Mon Jan 31, 2022 at 05:30 PM -0500
 
 #ifndef _FIT_DEMO_PARAM_DUMP_H_
 #define _FIT_DEMO_PARAM_DUMP_H_
@@ -36,16 +36,18 @@ void dumpParams(RooFitResult* result, string outputFile,
   if (useShortNames) varNamesTmp = completeFitVarNames(varNames);
 
   outYml << YAML::BeginMap;
-  for (const auto& n : varNamesTmp) {
+  for (auto i = 0; i < varNamesTmp.size(); i++) {
+    auto name = varNamesTmp[i];
+    auto key  = varNames[i];
     auto var =
-        static_cast<RooRealVar*>(result->floatParsFinal().find(n.c_str()));
+        static_cast<RooRealVar*>(result->floatParsFinal().find(name.c_str()));
 
     if (var) {
       // fitted value
-      outYml << YAML::Key << n + "_fitted";
+      outYml << YAML::Key << key + "_fitted";
       outYml << YAML::Value << var->getVal();
       // error
-      outYml << YAML::Key << n + "_error";
+      outYml << YAML::Key << key + "_error";
       outYml << YAML::Value << var->getError();
     }
   }
