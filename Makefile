@@ -1,5 +1,7 @@
 # Author: Yipeng Sun
-# Last Change: Tue Jan 11, 2022 at 04:40 AM +0100
+# Last Change: Mon Jan 31, 2022 at 05:16 PM -0500
+
+export PATH	:=	gen:$(PATH)
 
 VPATH := include:src:gen
 HEADERS := $(shell find ./include -name "*.h")

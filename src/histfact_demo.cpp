@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Wed Jan 19, 2022 at 01:40 AM +0100
+// Last Change: Mon Jan 31, 2022 at 05:11 PM -0500
 
 #include <functional>
 #include <iostream>
@@ -28,6 +28,7 @@
 #include "loader.h"
 #include "plot.h"
 #include "utils.h"
+#include "param_dump.h"
 
 #include "fit_samples/data.h"
 #include "fit_samples/mc.h"
@@ -263,6 +264,10 @@ void fit(ArgProxy params, Config addParams) {
   result->correlationMatrix().Print();
   printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
          swFit.RealTime(), swPrep.RealTime());
+
+  // Dump some parameters
+  string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
+  dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
 
   ///////////
   // Plots //
