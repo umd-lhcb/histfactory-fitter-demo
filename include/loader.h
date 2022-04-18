@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Fri Jan 07, 2022 at 04:28 PM +0100
+// Last Change: Mon Apr 18, 2022 at 12:12 PM -0400
 
 #ifndef _FIT_DEMO_LOADER_H_
 #define _FIT_DEMO_LOADER_H_
@@ -189,10 +189,10 @@ bool HistoLoader::fileExist(TString file) {
 }
 
 TString HistoLoader::absDir(TString folder) {
-  auto abs_path = realpath(folder.Data(), nullptr);
-  if (abs_path != nullptr) {
-    if (mVerbose) cout << "Folder absolute path: " << abs_path << endl;
-    return TString(abs_path);
+  auto absPath = realpath(folder.Data(), nullptr);
+  if (absPath != nullptr) {
+    if (mVerbose) cout << "Folder absolute path: " << absPath << endl;
+    return TString(absPath);
   }
 
   cerr << "Folder " << folder << " cannot be resolved!" << endl;
