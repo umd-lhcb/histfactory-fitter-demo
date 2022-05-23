@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Fri Jan 07, 2022 at 04:24 PM +0100
+// Last Change: Mon May 23, 2022 at 06:12 PM -0400
 
 #ifndef _FIT_DEMO_CMD_H_
 #define _FIT_DEMO_CMD_H_
@@ -47,7 +47,7 @@ T const ArgProxy::get(string const key) {
   if (!mParsedArgs[key].count() && defaultExist(mMode, key))
     return any_cast<T>(mDefaultVal[mMode][key]);
   // Otherwise just let the parser to handle it
-  return mParsedArgs[key].template as<T>();
+  return mParsedArgs[key].as<T>();
 }
 
 void ArgProxy::setMode(string const mode) {
