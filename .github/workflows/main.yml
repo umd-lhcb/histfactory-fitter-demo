@@ -8,12 +8,12 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v15
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v18
       with:
           extra_nix_config: |
               access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - uses: cachix/cachix-action@v10
+    - uses: cachix/cachix-action@v11
       with:
           name: histfactory-basis
     - run: nix develop --no-update-lock-file -c make fit
