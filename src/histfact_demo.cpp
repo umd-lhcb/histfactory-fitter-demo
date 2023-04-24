@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Mon Jan 31, 2022 at 05:11 PM -0500
+// Last Change: Tue Apr 25, 2023 at 03:04 AM +0800
 
 #include <functional>
 #include <iostream>
@@ -20,15 +20,16 @@
 // HistFactory headers
 #include <RooFitResult.h>
 #include <RooMinuit.h>
+#include <RooSimultaneous.h>
 #include <RooStats/HistFactory/MakeModelAndMeasurementsFast.h>
 #include <RooStats/HistFactory/PiecewiseInterpolation.h>
 
 // Project headers
 #include "cmd.h"
 #include "loader.h"
+#include "param_dump.h"
 #include "plot.h"
 #include "utils.h"
-#include "param_dump.h"
 
 #include "fit_samples/data.h"
 #include "fit_samples/mc.h"
@@ -178,8 +179,7 @@ void fit(ArgProxy params, Config addParams) {
   // Barlow-Beeston lite. Otherwise, every bin gets a minuit variable to
   // minimize over!  This class, on the other hand, allows a likelihood where
   // the bin parameters are analytically minimized at each step
-  unique_ptr<HistFactorySimultaneous> modelHf(
-      new HistFactorySimultaneous(*model));
+  unique_ptr<RooSimultaneous> modelHf(new RooSimultaneous(*model));
 
   auto poi = static_cast<RooRealVar *>(
       mc->GetParametersOfInterest()->createIterator()->Next());

@@ -35,7 +35,6 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  auto histoLoader =
-      HistoLoader(parsedArgsProxy.get<string>("inputDir"), true);
+  auto histoLoader = HistoLoader(parsedArgsProxy.get<string>("inputDir"), true);
   histoLoader.load();
 }

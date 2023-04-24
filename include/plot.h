@@ -1,6 +1,6 @@
 // Author: Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Fri Jan 07, 2022 at 04:29 PM +0100
+// Last Change: Tue Apr 25, 2023 at 03:01 AM +0800
 
 #ifndef _FIT_DEMO_PLOT_H_
 #define _FIT_DEMO_PLOT_H_
@@ -19,9 +19,8 @@
 #include <RooGlobalFunc.h>
 #include <RooPlot.h>
 #include <RooRealVar.h>
-#include <RooStats/HistFactory/HistFactorySimultaneous.h>
+#include <RooSimultaneous.h>
 
-using RooStats::HistFactory::HistFactorySimultaneous;
 using std::vector;
 
 // Stolen from:
@@ -111,7 +110,7 @@ std::unique_ptr<TCanvas> plotFitVars(vector<RooPlot*>& frames,
 /////////////
 
 vector<RooPlot*> plotC1(vector<RooRealVar*> vars, vector<TString> titles,
-                        RooAbsData* data, HistFactorySimultaneous* modelHf,
+                        RooAbsData* data, RooSimultaneous* modelHf,
                         RooCategory* chCat) {
   using namespace RooFit;
 
