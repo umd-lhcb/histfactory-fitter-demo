@@ -2,7 +2,7 @@
   description = "Phoebe's demo R(D*) HistFactory fitter";
 
   inputs = {
-    root-curated.url = "github:umd-lhcb/root-curated";
+    root-curated.url = "github:umd-lhcb/root-curated/dev";
     nixpkgs.follows = "root-curated/nixpkgs";
     flake-utils.follows = "root-curated/flake-utils";
   };
@@ -30,8 +30,11 @@
             boost
 
             # Pick your favorite version of ROOT here
+            # ROOT 6.28 stack
+            root_6_28_02
+
             # ROOT 6.24 stack
-            root_6_24_02
+            #root_6_24_02
 
             # ROOT 6.16 stack, plotting is bugged for this version
             #root_6_16_00
