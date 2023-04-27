@@ -227,7 +227,8 @@ void fit(ArgProxy params, Config addParams) {
 
   cout << "DEBUG: BEFORE FIT:" << endl;
   cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
-  auto integral=model->createIntegral(*(obs->selectByName("*Dstmu*")));
+  RooRealSumPdf *chanPdf= (RooRealSumPdf*) ws->pdf("Dstmu_kinematic_model");
+  auto integral=chanPdf->createIntegral(*(obs->selectByName("*Dstmu*")));
   cout << "integral: " << integral->getVal() << endl;
   cout << "==============================" << endl;
   cout << "Minimizing the Minuit (Migrad)" << endl;
@@ -300,7 +301,8 @@ void fit(ArgProxy params, Config addParams) {
 
   auto c1 = plotFitVars(fitVarFrames, fitVarAnchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.pdf");
- }
+
+}
 
 //////////
 // Main //
