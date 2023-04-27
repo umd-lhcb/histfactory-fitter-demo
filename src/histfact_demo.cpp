@@ -146,7 +146,7 @@ void fit(ArgProxy params, Config addParams) {
 
   auto theIW = static_cast<PiecewiseInterpolation *>(
       ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
-  theIW->Print("V");
+  if(theIW!=nullptr) theIW->Print("V");
 
   // Lets tell roofit the right names for our histogram variables //
   auto obs = static_cast<const RooArgSet *>(mc->GetObservables());
