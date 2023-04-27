@@ -17,15 +17,21 @@ histfact_demo: $(HEADERS)
 cmd_demo: cmd.h
 histo_loader_demo: loader.h
 
-.PHONY: all clean fit args load-histo
+.PHONY: all clean fit fit-nobb fit-noshapes args load-histo
 
-all: clean args load-histo fit
+all: clean args load-histo fit fit-nobb fit-noshapes
 
 clean:
 	@rm -rf ./gen/*
 
 fit: inputs/* histfact_demo
-	histfact_demo -i inputs -o gen 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+	histfact_demo -i inputs -o gen --useMinos=false 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+
+fit-nobb: inputs/* histfact_demo
+	histfact_demo -i inputs -o gen --useMinos=false --bbOn3D=false 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+  
+fit-noshapes: inputs/* histfact_demo
+	histfact_demo -i inputs -o gen --useMinos=false --useMuShapeUncerts=false --useTauShapeUncerts=false --useDststShapeUncerts=false --bbOn3D=false 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
 
 args: cmd_demo
 	cmd_demo --help
