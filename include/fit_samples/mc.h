@@ -26,7 +26,7 @@ void addMcNorm(Channel& chan, ArgProxy params, Config addParams) {
   sample.SetHisto(addParams.get<TH1*>("h_sigmu"));
 
   sample.SetNormalizeByTheory(kFALSE);
-  sample.AddNormFactor("Nmu", params.get<double>("expMu"), 1e-6, 1e6);
+  sample.AddNormFactor("Nmu", params.get<double>("expMu"), 1, 1e6);
   sample.AddNormFactor("mcNorm_sigmu", addParams.get<double>("h_sigmu_NormFac"),
                        1e-9, 1.);
 

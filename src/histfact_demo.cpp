@@ -21,8 +21,14 @@
 #include <RooFitResult.h>
 #include <RooMinuit.h>
 #include <RooSimultaneous.h>
+#include <RooMinimizer.h>
+#include <RooRealSumPdf.h>
+#include <RooDataSet.h>
+#include <RooDataHist.h>
+#include <RooStats/HistFactory/RooBarlowBeestonLL.h>
 #include <RooStats/HistFactory/MakeModelAndMeasurementsFast.h>
 #include <RooStats/HistFactory/PiecewiseInterpolation.h>
+#include <RooProdPdf.h>
 
 // Project headers
 #include "cmd.h"
@@ -58,6 +64,7 @@ void fixNuisanceParams(ModelConfig *mc) {
 void configNuisanceParams(ModelConfig *mc) {
   setNuisanceParamVal(mc, NuParamKeyVal{{"NDstst0", 0.102}});
   setNuisanceParamRange(mc, NuParamKeyRange{{"alpha_BFD1", {-3.0, 3.0}}});
+  setNuisanceParamRange(mc, NuParamKeyRange{{"Lumi", {0, 3.0}}});
   setNuisanceParamConst(mc, {"fD1", "NmisID"});
 }
 
@@ -88,7 +95,7 @@ void fixShapesDstst(ModelConfig *mc) {
 
 void fit(ArgProxy params, Config addParams) {
   // avoid accidental unblinding!
-  RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
   ///////////////////////
   // Initialize fitter //
@@ -112,7 +119,7 @@ void fit(ArgProxy params, Config addParams) {
   //
   // actually, now this is only used for the misID
   meas.SetLumi(params.get<double>("relLumi"));
-  meas.SetLumiRelErr(0.05);
+  meas.SetLumiRelErr(0.1);
 
   RooStats::HistFactory::Channel chan("Dstmu_kinematic");
   chan.SetStatErrorConfig(1e-5, "Poisson");
@@ -146,7 +153,7 @@ void fit(ArgProxy params, Config addParams) {
 
   auto theIW = static_cast<PiecewiseInterpolation *>(
       ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
-  theIW->Print("V");
+  if(theIW != NULL) theIW->Print("V");
 
   // Lets tell roofit the right names for our histogram variables //
   auto obs = static_cast<const RooArgSet *>(mc->GetObservables());
@@ -175,11 +182,7 @@ void fit(ArgProxy params, Config addParams) {
   if (params.get<bool>("fixShapes")) fixShapes(mc);
   if (params.get<bool>("fixShapesDstst")) fixShapesDstst(mc);
 
-  // This switches the model to a class written to handle analytic
-  // Barlow-Beeston lite. Otherwise, every bin gets a minuit variable to
-  // minimize over!  This class, on the other hand, allows a likelihood where
-  // the bin parameters are analytically minimized at each step
-  unique_ptr<RooSimultaneous> modelHf(new RooSimultaneous(*model));
+  unique_ptr<RooSimultaneous> modelHf(model);
 
   auto poi = static_cast<RooRealVar *>(
       mc->GetParametersOfInterest()->createIterator()->Next());
@@ -201,17 +204,19 @@ void fit(ArgProxy params, Config addParams) {
   theVars->add(poiErr);
 
   auto data  = static_cast<RooAbsData *>(ws->data("obsData"));
-  auto nllHf = modelHf->createNLL(*data, Offset(kTRUE));
 
-  unique_ptr<RooArgSet> temp(new RooArgSet());
-  nllHf->getParameters(temp.get())->Print("V");
+  auto nllHf = model->createNLL(*data, Offset(kTRUE), GlobalObservables(*(mc->GetGlobalObservables())));
+  auto bbnllHf = std::make_unique<RooBarlowBeestonLL>("bbnll","bbnll",*nllHf);
+  bbnllHf->setPdf(modelHf.get());
+  bbnllHf->setDataset(data);
+  bbnllHf->initializeBarlowCache();
+  RooArgSet temp; 
+  bbnllHf->getParameters(nullptr, temp);
 
-  unique_ptr<RooMinuit> minuitHf(new RooMinuit(*nllHf));
+  
+  unique_ptr<RooMinimizer> minuitHf(new RooMinimizer(*bbnllHf));
+  minuitHf->setStrategy(1);
   minuitHf->setErrorLevel(0.5);
-
-#ifndef UNBLIND
-  minuitHf->setPrintLevel(-1);
-#endif
 
   ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
   swPrep.Stop();
@@ -220,15 +225,20 @@ void fit(ArgProxy params, Config addParams) {
   // Do fit //
   ////////////
 
+  cout << "DEBUG: BEFORE FIT:" << endl;
+  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
+  auto integral=model->createIntegral(*(obs->selectByName("*Dstmu*")));
+  cout << "integral: " << integral->getVal() << endl;
   cout << "==============================" << endl;
   cout << "Minimizing the Minuit (Migrad)" << endl;
-
   TStopwatch swFit;
   swFit.Reset();
   swFit.Start();
 
   minuitHf->setStrategy(2);
-  minuitHf->fit("smh");
+  //minuitHf->fit("smh");
+  minuitHf->migrad();
+  minuitHf->hesse();
 
   auto tempResult = minuitHf->save("TempResult", "TempResult");
   cout << tempResult->edm() << endl;
@@ -265,9 +275,13 @@ void fit(ArgProxy params, Config addParams) {
   printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
          swFit.RealTime(), swPrep.RealTime());
 
+  cout << "DEBUG: AFTER FIT:" << endl;
+  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
+  cout << "integral: " << integral->getVal() << endl;
   // Dump some parameters
-  string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
-  dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
+  //string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
+  //dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
+
 
   ///////////
   // Plots //
@@ -286,7 +300,7 @@ void fit(ArgProxy params, Config addParams) {
 
   auto c1 = plotFitVars(fitVarFrames, fitVarAnchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.pdf");
-}
+ }
 
 //////////
 // Main //
@@ -353,6 +367,7 @@ int main(int argc, char **argv) {
   auto addParams = histoLoader.getConfig();
 
   fit(parsedArgsProxy, addParams);
+
 
   return 0;
 }
