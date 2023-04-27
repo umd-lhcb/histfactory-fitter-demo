@@ -123,15 +123,15 @@ vector<RooPlot*> plotC1(vector<RooRealVar*> vars, vector<TString> titles,
                  Cut("channelCat==0"), MarkerSize(0.4), DrawOption("ZP"));
 
     modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
-                    DrawOption("F"), FillColor(kRed), LineColor(kRed));
+                    DrawOption("F"), FillColor(kRed));
     modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
                     DrawOption("F"), FillColor(kViolet),
-                    Components("*misID*,*sigmu*,*D1*"), LineColor(kViolet));
+                    Components("*misID*,*sigmu*,*D1*"));
     modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
                     DrawOption("F"), FillColor(kBlue + 1),
-                    Components("*misID*,*sigmu*"), LineColor(kBlue+1));
+                    Components("*misID*,*sigmu*"));
     modelHf->plotOn(frames[idx], Slice(*chCat), ProjWData(*chCat, *data),
-                    DrawOption("F"), FillColor(kOrange), Components("*misID*"), LineColor(kOrange));
+                    DrawOption("F"), FillColor(kOrange), Components("*misID*"));
   }
 
   return frames;

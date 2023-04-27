@@ -279,8 +279,8 @@ void fit(ArgProxy params, Config addParams) {
   cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
   cout << "integral: " << integral->getVal() << endl;
   // Dump some parameters
-  //string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
-  //dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
+  string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
+  dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
 
 
   ///////////
