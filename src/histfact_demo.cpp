@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jun 06, 2023 at 11:46 PM +0800
+// Last Change: Wed Jun 07, 2023 at 12:15 AM +0800
 
 #include <functional>
 #include <iostream>
@@ -91,7 +91,7 @@ void fixShapesDstst(ModelConfig *mc) {
 
 void loadPrefit(string &wsFilePath, RooWorkspace *ws,
                 TString wsName = "Result") {
-  cout << "Loading ALL parameters from workspace file " << wsFilePath;
+  cout << "Loading ALL parameters from workspace file " << wsFilePath << endl;
   TFile wsFile(wsFilePath.c_str());
   auto  savedWs = dynamic_cast<RooFitResult *>(wsFile.Get(wsName));
   assert(savedWs != nullptr);
@@ -103,8 +103,8 @@ void loadPrefit(string &wsFilePath, RooWorkspace *ws,
 
     if (currentArg != nullptr) {
       cout << "  Loading " << varName << endl;
-      cout << "    before: " << currentArg->getVal();
-      cout << "    after:  " << savedArg->getVal();
+      cout << "    before: " << currentArg->getVal() << endl;
+      cout << "    after:  " << savedArg->getVal() << endl;
       currentArg->setVal(savedArg->getVal());
     }
   }
@@ -316,6 +316,16 @@ void fit(ArgProxy params, Config addParams) {
   result->correlationMatrix().Print();
   printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
          swFit.RealTime(), swPrep.RealTime());
+
+  if (result != nullptr) {
+    cout << "Saving fit result..." << endl;
+    TFile fitResultFile(outputDir + "/fit_output/saved_result.root",
+                        "RECREATE");
+    fitResultFile.cd();
+    fitResultFile.Add(result);
+    fitResultFile.Write();
+    fitResultFile.Close();
+  }
 
   cout << "DEBUG: AFTER FIT:" << endl;
   cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs)
