@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jun 06, 2023 at 11:21 PM +0800
+// Last Change: Tue Jun 06, 2023 at 11:38 PM +0800
 
 #include <functional>
 #include <iostream>
@@ -87,6 +87,27 @@ void fixShapes(ModelConfig *mc) {
 
 void fixShapesDstst(ModelConfig *mc) {
   setNuisanceParamVal(mc, {{"alpha_IW", -0.005 /* -2.187 */}});
+}
+
+void loadPrefit(string &wsFilePath, RooWorkspace *ws,
+                TString wsName = "Result") {
+  cout << "Loading ALL parameters from workspace file " << wsFilePath;
+  TFile wsFile(wsFilePath.c_str());
+  auto  savedWs = dynamic_cast<RooFitResult *>(wsFile.Get(wsName));
+  assert(savedWs != nullptr);
+
+  for (int i = 0; i < savedWs->floatParsFinal().getSize(); i++) {
+    auto savedArg = dynamic_cast<RooRealVar *>(savedWs->floatParsFinal().at(i));
+    auto varName  = savedArg->GetName();
+    RooRealVar *currentArg = ws->var(varName);
+
+    if (currentArg != nullptr) {
+      cout << "  Loading " << varName << endl;
+      cout << "    before: " << currentArg->getVal();
+      cout << "    after:  " << savedArg->getVal();
+      currentArg->setVal(savedArg->getVal());
+    }
+  }
 }
 
 ////////////////////////
@@ -220,6 +241,12 @@ void fit(ArgProxy params, Config addParams) {
   ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
   swPrep.Stop();
 
+  // Optionally load parameters from an existing workspace
+  auto wsPrefit = params.get<string>("loadPrefit");
+  if (wsPrefit != "none") {
+    loadPrefit(wsPrefit, ws);
+  }
+
   ////////////
   // Do fit //
   ////////////
@@ -317,6 +344,8 @@ int main(int argc, char **argv) {
     ("o,outputDir", "output directory for fit results", cxxopts::value<string>())
     ("m,mode", "fitter mode", cxxopts::value<string>()
      ->default_value("fullFit"))
+    ("loadPrefit", "Load prefit parameters from fit result file",
+     cxxopts::value<string>()->default_value("none"))
     ////
     ("constrainDstst", "constrain D** yield to that of normalization")
     ("useMuShapeUncerts", "use D* FF variations w/o helicity-suppressed one")
