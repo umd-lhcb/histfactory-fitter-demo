@@ -1,5 +1,5 @@
 # Author: Yipeng Sun
-# Last Change: Mon Jan 31, 2022 at 06:06 PM -0500
+# Last Change: Wed Jun 07, 2023 at 12:14 AM +0800
 
 export PATH	:=	gen:$(PATH)
 
@@ -29,7 +29,13 @@ fit: inputs/* histfact_demo
 
 fit-nobb: inputs/* histfact_demo
 	histfact_demo -i inputs -o gen --useMinos=false --bbOn3D=false 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
-  
+
+fit-nobb-load: inputs/* histfact_demo
+	histfact_demo -i inputs -o gen \
+		--useMinos=false --bbOn3D=false \
+		--loadPrefit=./gen/fit_output/saved_result.root \
+		2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
+
 fit-noshapes: inputs/* histfact_demo
 	histfact_demo -i inputs -o gen --useMinos=false --useMuShapeUncerts=false --useTauShapeUncerts=false --useDststShapeUncerts=false --bbOn3D=false 2>&1 | tee ./logs/fit_$$(date +%y_%m_%d_%H%M%S).log
 

@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Apr 25, 2023 at 03:04 AM +0800
+// Last Change: Wed Jun 07, 2023 at 12:15 AM +0800
 
 #include <functional>
 #include <iostream>
@@ -18,17 +18,17 @@
 #include <TString.h>
 
 // HistFactory headers
-#include <RooFitResult.h>
-#include <RooMinuit.h>
-#include <RooSimultaneous.h>
-#include <RooMinimizer.h>
-#include <RooRealSumPdf.h>
-#include <RooDataSet.h>
 #include <RooDataHist.h>
-#include <RooStats/HistFactory/RooBarlowBeestonLL.h>
+#include <RooDataSet.h>
+#include <RooFitResult.h>
+#include <RooMinimizer.h>
+#include <RooMinuit.h>
+#include <RooProdPdf.h>
+#include <RooRealSumPdf.h>
+#include <RooSimultaneous.h>
 #include <RooStats/HistFactory/MakeModelAndMeasurementsFast.h>
 #include <RooStats/HistFactory/PiecewiseInterpolation.h>
-#include <RooProdPdf.h>
+#include <RooStats/HistFactory/RooBarlowBeestonLL.h>
 
 // Project headers
 #include "cmd.h"
@@ -89,6 +89,27 @@ void fixShapesDstst(ModelConfig *mc) {
   setNuisanceParamVal(mc, {{"alpha_IW", -0.005 /* -2.187 */}});
 }
 
+void loadPrefit(string &wsFilePath, RooWorkspace *ws,
+                TString wsName = "Result") {
+  cout << "Loading ALL parameters from workspace file " << wsFilePath << endl;
+  TFile wsFile(wsFilePath.c_str());
+  auto  savedWs = dynamic_cast<RooFitResult *>(wsFile.Get(wsName));
+  assert(savedWs != nullptr);
+
+  for (int i = 0; i < savedWs->floatParsFinal().getSize(); i++) {
+    auto savedArg = dynamic_cast<RooRealVar *>(savedWs->floatParsFinal().at(i));
+    auto varName  = savedArg->GetName();
+    RooRealVar *currentArg = ws->var(varName);
+
+    if (currentArg != nullptr) {
+      cout << "  Loading " << varName << endl;
+      cout << "    before: " << currentArg->getVal() << endl;
+      cout << "    after:  " << savedArg->getVal() << endl;
+      currentArg->setVal(savedArg->getVal());
+    }
+  }
+}
+
 ////////////////////////
 // Fitter setup: Main //
 ////////////////////////
@@ -145,7 +166,21 @@ void fit(ArgProxy params, Config addParams) {
   // Change fit parameters //
   ///////////////////////////
 
+  // FIXME: from https://github.com/root-project/root/issues/12729#issuecomment-1527829256
+#if ROOT_VERSION_CODE < ROOT_VERSION(6, 28, 00)
   auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
+#else
+  // Disable the binned fit optimization that was enabled by default in
+  // ROOT 6.28. This optimization skips the normalization of the RooRealSumPdf,
+  // because the unnormalized bin contents already represent the yields that can
+  // be used by the RooNLLVar to sum the Poisson terms. However, this
+  // optimization doesn't work for this demo, maybe because it's not compatible
+  // with the RooBarlowBeestonLL. See also
+  // https://root.cern/doc/v628/release-notes.html.
+  HistoToWorkspaceFactoryFast::Configuration cfg;
+  cfg.binnedFitOptimization = false;
+  auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas, cfg);
+#endif
 
   // Get model manually
   auto mc    = static_cast<ModelConfig *>(ws->obj("ModelConfig"));
@@ -153,7 +188,7 @@ void fit(ArgProxy params, Config addParams) {
 
   auto theIW = static_cast<PiecewiseInterpolation *>(
       ws->obj("h_D1_Dstmu_kinematic_Hist_alpha"));
-  if(theIW!=nullptr) theIW->Print("V");
+  if (theIW != nullptr) theIW->Print("V");
 
   // Lets tell roofit the right names for our histogram variables //
   auto obs = static_cast<const RooArgSet *>(mc->GetObservables());
@@ -174,8 +209,7 @@ void fit(ArgProxy params, Config addParams) {
   fixNuisanceParams(mc);
   configNuisanceParams(mc);
 
-  // Looks like shape uncertainties and fix shapes should NOT be enabled at the
-  // same time
+  // Shape uncertainties and fix shapes should NOT be enabled at the same time
   if (params.get<bool>("useDststShapeUncerts")) useDststShapeUncerts(mc);
   if (params.get<bool>("useMuShapeUncerts")) useMuShapeUncerts(mc);
 
@@ -203,17 +237,17 @@ void fit(ArgProxy params, Config addParams) {
   auto       theVars = static_cast<RooArgSet *>(allPars->Clone());
   theVars->add(poiErr);
 
-  auto data  = static_cast<RooAbsData *>(ws->data("obsData"));
+  auto data = static_cast<RooAbsData *>(ws->data("obsData"));
 
-  auto nllHf = model->createNLL(*data, Offset(kTRUE), GlobalObservables(*(mc->GetGlobalObservables())));
-  auto bbnllHf = std::make_unique<RooBarlowBeestonLL>("bbnll","bbnll",*nllHf);
+  auto nllHf = model->createNLL(
+      *data, Offset(kTRUE), GlobalObservables(*(mc->GetGlobalObservables())));
+  auto bbnllHf = std::make_unique<RooBarlowBeestonLL>("bbnll", "bbnll", *nllHf);
   bbnllHf->setPdf(modelHf.get());
   bbnllHf->setDataset(data);
   bbnllHf->initializeBarlowCache();
-  RooArgSet temp; 
+  RooArgSet temp;
   bbnllHf->getParameters(nullptr, temp);
 
-  
   unique_ptr<RooMinimizer> minuitHf(new RooMinimizer(*bbnllHf));
   minuitHf->setStrategy(1);
   minuitHf->setErrorLevel(0.5);
@@ -221,14 +255,21 @@ void fit(ArgProxy params, Config addParams) {
   ws->saveSnapshot("TMCPARS", *allPars, kTRUE);
   swPrep.Stop();
 
+  // Optionally load parameters from an existing workspace
+  auto wsPrefit = params.get<string>("loadPrefit");
+  if (wsPrefit != "none") {
+    loadPrefit(wsPrefit, ws);
+  }
+
   ////////////
   // Do fit //
   ////////////
 
   cout << "DEBUG: BEFORE FIT:" << endl;
-  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
-  RooRealSumPdf *chanPdf= (RooRealSumPdf*) ws->pdf("Dstmu_kinematic_model");
-  auto integral=chanPdf->createIntegral(*(obs->selectByName("*Dstmu*")));
+  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs)
+       << " model" << endl;
+  RooRealSumPdf *chanPdf = (RooRealSumPdf *)ws->pdf("Dstmu_kinematic_model");
+  auto integral = chanPdf->createIntegral(*(obs->selectByName("*Dstmu*")));
   cout << "integral: " << integral->getVal() << endl;
   cout << "==============================" << endl;
   cout << "Minimizing the Minuit (Migrad)" << endl;
@@ -237,7 +278,7 @@ void fit(ArgProxy params, Config addParams) {
   swFit.Start();
 
   minuitHf->setStrategy(2);
-  //minuitHf->fit("smh");
+  // minuitHf->fit("smh");
   minuitHf->migrad();
   minuitHf->hesse();
 
@@ -276,13 +317,23 @@ void fit(ArgProxy params, Config addParams) {
   printf("Stopwatch: fit ran in %f seconds with %f seconds in prep\n",
          swFit.RealTime(), swPrep.RealTime());
 
+  if (result != nullptr) {
+    cout << "Saving fit result..." << endl;
+    TFile fitResultFile(outputDir + "/fit_output/saved_result.root",
+                        "RECREATE");
+    fitResultFile.cd();
+    fitResultFile.Add(result);
+    fitResultFile.Write();
+    fitResultFile.Close();
+  }
+
   cout << "DEBUG: AFTER FIT:" << endl;
-  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs) << " model" << endl;
+  cout << data->sumEntries() << " data, \t" << model->expectedEvents(obs)
+       << " model" << endl;
   cout << "integral: " << integral->getVal() << endl;
   // Dump some parameters
   string outYmlFilename = params.get<string>("outputDir") + "/params.yml";
   dumpParams(result, outYmlFilename, {"IW", "v1mu", "v2mu", "v3mu"});
-
 
   ///////////
   // Plots //
@@ -301,7 +352,6 @@ void fit(ArgProxy params, Config addParams) {
 
   auto c1 = plotFitVars(fitVarFrames, fitVarAnchors, "c1", 1000, 300);
   c1->SaveAs(outputDir + "/" + "c1.pdf");
-
 }
 
 //////////
@@ -314,25 +364,26 @@ int main(int argc, char **argv) {
   // clang-format off
   argOpts.add_options()
     ("h,help", "print usage")
-    ("i,inputDir", "input fit templates", cxxopts::value<string>())
-    ("o,outputDir", "output directory", cxxopts::value<string>())
+    ("i,inputDir", "input directory to fit templates", cxxopts::value<string>())
+    ("o,outputDir", "output directory for fit results", cxxopts::value<string>())
     ("m,mode", "fitter mode", cxxopts::value<string>()
      ->default_value("fullFit"))
+    ("loadPrefit", "Load prefit parameters from fit result file",
+     cxxopts::value<string>()->default_value("none"))
     ////
-    ("constrainDstst", "constrain D** normalization")
-    ("useMuShapeUncerts", "constrain normalization shape")
-    ("useTauShapeUncerts", "constrain signal shape")
-    ("useDststShapeUncerts", "constrain D** shape")
-    ("fixShapes", "?")
-    ("fixShapesDstst", "?")
+    ("constrainDstst", "constrain D** yield to that of normalization")
+    ("useMuShapeUncerts", "use D* FF variations w/o helicity-suppressed one")
+    ("useTauShapeUncerts", "use D* FF variations incl. helicity-suppressed one")
+    ("useDststShapeUncerts", "use D** FF variations")
+    ("fixShapes", "Fix D* FF variations at a given value")
+    ("fixShapesDstst", "Fix D** FF variations at a given value")
     ////
-    ("useMinos", "?")
-    ("bbOn3D", "enable Barlow-Beeston procedure for all histograms (legacy)")
+    ("useMinos", "use MINOS for error evaluation")
+    ("bbOn3D", "enable Barlow-Beeston procedure for all histograms")
     ////
-    // ISOLATED FULL RANGE NONN (huh?)
-    ("expTau", "?", cxxopts::value<double>()
+    ("expTau", "expected yield of signal", cxxopts::value<double>()
      ->default_value(to_string(0.252 * 0.1742 * 0.781 / 0.85)))
-    ("expMu", "?", cxxopts::value<double>()
+    ("expMu", "expected yield of normalization", cxxopts::value<double>()
      ->default_value("50e3"))
     ("relLumi", "set relative luminosity between data used to generate pdf"
      " and the sample we are fitting, in fb^{-1}.", cxxopts::value<double>()
@@ -369,7 +420,6 @@ int main(int argc, char **argv) {
   auto addParams = histoLoader.getConfig();
 
   fit(parsedArgsProxy, addParams);
-
 
   return 0;
 }
