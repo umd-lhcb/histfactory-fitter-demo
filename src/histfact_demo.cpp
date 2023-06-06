@@ -1,6 +1,6 @@
 // Author: Phoebe Hamilton, Yipeng Sun
 // License: BSD 2-clause
-// Last Change: Tue Jun 06, 2023 at 11:38 PM +0800
+// Last Change: Tue Jun 06, 2023 at 11:46 PM +0800
 
 #include <functional>
 #include <iostream>
@@ -166,7 +166,21 @@ void fit(ArgProxy params, Config addParams) {
   // Change fit parameters //
   ///////////////////////////
 
+  // FIXME: from https://github.com/root-project/root/issues/12729#issuecomment-1527829256
+#if ROOT_VERSION_CODE < ROOT_VERSION(6, 28, 00)
   auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas);
+#else
+  // Disable the binned fit optimization that was enabled by default in
+  // ROOT 6.28. This optimization skips the normalization of the RooRealSumPdf,
+  // because the unnormalized bin contents already represent the yields that can
+  // be used by the RooNLLVar to sum the Poisson terms. However, this
+  // optimization doesn't work for this demo, maybe because it's not compatible
+  // with the RooBarlowBeestonLL. See also
+  // https://root.cern/doc/v628/release-notes.html.
+  HistoToWorkspaceFactoryFast::Configuration cfg;
+  cfg.binnedFitOptimization = false;
+  auto ws = RooStats::HistFactory::MakeModelAndMeasurementFast(meas, cfg);
+#endif
 
   // Get model manually
   auto mc    = static_cast<ModelConfig *>(ws->obj("ModelConfig"));
